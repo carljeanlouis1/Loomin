@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loomin Pitch Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* Layout: a fixed 1600x900 stage scaled to the window; one slide visible at a time */
+:root {
+  color-scheme: light;
+  --paper: #eef2ef;
+  --surface: #fcfcfb;
+  --ink: #13211c;
+  --ink-2: #47554f;
+  --muted: #76827d;
+  --line: #d3dbd6;
+  --rail: #173a32;
+  --rail-ink: #dfe9e4;
+  --rail-muted: #8fb0a5;
+  --brass: #a87a22;
+  --brass-hi: #d5a84d;
+  --brass-soft: #f3e7cc;
+  --pos: #2a78d6;
+  --pos-soft: #dbe9fa;
+  --neg: #e34948;
+  --neg-soft: #fbe0df;
+  --good: #006300;
+  --stage-bg: #0d1a16;
+  --display: "Bricolage Grotesque", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--stage-bg); color: var(--ink); font-family: var(--body); overflow: hidden; -webkit-font-smoothing: antialiased; }
+.viewport { position: fixed; inset: 0; overflow: hidden; }
+.stage { width: 1600px; height: 900px; position: absolute; left: 50%; top: 50%; transform-origin: center; }
+.slide { position: absolute; inset: 0; background: var(--paper); overflow: hidden; visibility: hidden; opacity: 0; transition: opacity .45s ease, visibility .45s; }
+.slide.active { visibility: visible; opacity: 1; }
+.slide.dark { background: var(--rail); color: var(--rail-ink); }
+.pad { position: absolute; inset: 72px 96px 84px; display: flex; flex-direction: column; }
+h1, h2 { font-family: var(--display); letter-spacing: -.025em; margin: 0; text-wrap: balance; font-weight: 600; }
+h2 { font-size: 58px; line-height: 1.04; max-width: 21ch; }
+.kicker { font-size: 21px; color: var(--muted); margin: 0 0 16px; }
+.dark .kicker { color: var(--rail-muted); }
+p { margin: 0; }
+.foot { position: absolute; left: 96px; right: 96px; bottom: 30px; display: flex; justify-content: space-between; font-size: 15px; color: var(--muted); }
+.dark .foot { color: var(--rail-muted); }
+.src { font-size: 14px; color: var(--muted); }
+mark { color: inherit; padding: 0 3px; border-radius: 4px; background: transparent; box-shadow: none; transition: background .5s, box-shadow .5s; }
+.logo-mark { width: 44px; height: 44px; border-radius: 50%; border: 3px solid var(--brass-hi); display: grid; place-items: center; }
+.logo-mark span { width: 14px; height: 14px; border-radius: 50%; background: var(--brass-hi); }
+.logo { display: flex; align-items: center; gap: 14px; font-family: var(--display); font-weight: 650; font-size: 30px; }
+
+/* entrance choreography: elements with .in rise in when their slide is active */
+.in { opacity: 0; transform: translateY(18px); transition: opacity .6s cubic-bezier(.2,.7,.2,1), transform .6s cubic-bezier(.2,.7,.2,1); transition-delay: calc(var(--d, 0) * 1s); }
+.slide.active .in { opacity: 1; transform: none; }
+
+/* ---------- 1 title ---------- */
+.s-title .threads { position: absolute; right: -40px; top: 0; height: 100%; width: 62%; }
+.s-title .threads path { stroke-dasharray: 1400; stroke-dashoffset: 1400; transition: stroke-dashoffset 2.2s cubic-bezier(.3,.6,.2,1); }
+.s-title.active .threads path { stroke-dashoffset: 0; }
+.s-title .threads path:nth-child(2) { transition-delay: .15s; } .s-title .threads path:nth-child(3) { transition-delay: .3s; }
+.s-title .threads path:nth-child(4) { transition-delay: .45s; } .s-title .threads path:nth-child(5) { transition-delay: .6s; } .s-title .threads path:nth-child(6) { transition-delay: .75s; }
+.s-title .knot { opacity: 0; transition: opacity .6s 2s; } .s-title.active .knot { opacity: 1; }
+.s-title h1 { font-size: 150px; line-height: .9; letter-spacing: -.045em; margin: 0 0 18px; font-weight: 620; }
+.s-title .sub { font-size: 36px; font-family: var(--display); font-weight: 500; color: var(--rail-ink); margin-bottom: 26px; }
+.s-title .line { font-size: 22px; color: var(--rail-muted); max-width: 30ch; line-height: 1.45; }
+.track { display: inline-flex; gap: 10px; align-items: center; border: 1px solid rgba(255,255,255,.18); border-radius: 30px; padding: 8px 18px; font-size: 17px; color: var(--rail-ink); width: fit-content; }
+.track b { color: var(--brass-hi); font-weight: 600; }
+
+/* ---------- 2 broken workflow ---------- */
+.flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 18px; margin-top: 44px; }
+.flow .step { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 20px 22px; position: relative; }
+.flow .num { font-family: var(--display); font-weight: 650; font-size: 30px; color: var(--muted); line-height: 1; margin-bottom: 14px; }
+.flow .t { font-weight: 600; font-size: 21px; line-height: 1.25; margin-bottom: 8px; }
+.flow .d { font-size: 16px; color: var(--ink-2); line-height: 1.45; }
+.flow .step:not(:last-child)::after { content: ""; position: absolute; right: -14px; top: 38px; width: 10px; height: 10px; border-top: 2px solid var(--line); border-right: 2px solid var(--line); transform: rotate(45deg); }
+.clockrow { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 26px; margin-top: auto; align-items: end; }
+.cost { background: var(--neg-soft); border-radius: 14px; padding: 22px 26px; font-size: 22px; line-height: 1.4; }
+.cost b { color: #b2302f; }
+.stat { border-top: 2px solid var(--ink); padding-top: 14px; }
+.stat .big { font-family: var(--display); font-size: 64px; font-weight: 620; letter-spacing: -.03em; line-height: 1; }
+.stat .lab { font-size: 18px; color: var(--ink-2); margin: 8px 0 8px; line-height: 1.35; }
+
+/* ---------- 3 tools ---------- */
+.tools { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: 50px; }
+.tool { padding: 26px 0 0; border-top: 2px solid var(--ink); }
+.tool .h { font-family: var(--display); font-size: 30px; font-weight: 600; letter-spacing: -.015em; margin-bottom: 12px; }
+.tool p { font-size: 19px; color: var(--ink-2); line-height: 1.5; }
+.tool .fig { font-family: var(--display); font-size: 46px; font-weight: 620; color: var(--ink); letter-spacing: -.03em; margin-bottom: 6px; }
+.gapline { margin-top: auto; background: var(--rail); color: var(--rail-ink); border-radius: 16px; padding: 26px 30px; font-family: var(--display); font-size: 30px; font-weight: 520; line-height: 1.3; }
+.gapline b { color: var(--brass-hi); font-weight: 600; }
+
+/* ---------- 4 AI differently ---------- */
+.ai-grid { display: grid; grid-template-columns: 1.15fr 1fr; gap: 56px; margin-top: 40px; flex: 1; }
+.review { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 28px 30px; box-shadow: 0 20px 50px rgba(19,33,28,.1); }
+.review .who { display: flex; align-items: center; gap: 12px; font-size: 17px; margin-bottom: 14px; }
+.glyph { width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 14px; }
+.stars { color: var(--brass); letter-spacing: 2px; } .stars i { color: var(--line); font-style: normal; }
+.review .txt { font-size: 27px; line-height: 1.5; }
+.tags { display: flex; gap: 10px; margin-top: 18px; }
+.tag { font-size: 16px; border-radius: 8px; padding: 4px 12px; font-weight: 600; opacity: 0; transform: scale(.8); transition: opacity .4s, transform .4s cubic-bezier(.3,1.6,.5,1); }
+.tag.p { background: var(--pos-soft); color: var(--pos); } .tag.n { background: var(--neg-soft); color: var(--neg); }
+.s-ai.active mark.p { background: var(--pos-soft); box-shadow: inset 0 -3px 0 var(--pos); transition-delay: .9s; }
+.s-ai.active mark.n { background: var(--neg-soft); box-shadow: inset 0 -3px 0 var(--neg); transition-delay: 1.6s; }
+.s-ai.active .tag.p { opacity: 1; transform: none; transition-delay: 1.2s; } .s-ai.active .tag.n { opacity: 1; transform: none; transition-delay: 1.9s; }
+.does { display: flex; flex-direction: column; gap: 0; }
+.does li { list-style: none; display: grid; grid-template-columns: 40px 1fr; gap: 14px; padding: 18px 0; border-top: 1px solid var(--line); }
+.does li:first-child { border-top: 0; padding-top: 4px; }
+.does .ico { width: 40px; height: 40px; border-radius: 10px; background: var(--brass-soft); display: grid; place-items: center; color: var(--brass); }
+.does .ico svg { width: 22px; height: 22px; }
+.does b { display: block; font-size: 22px; font-weight: 600; margin-bottom: 2px; }
+.does span { font-size: 17.5px; color: var(--ink-2); line-height: 1.45; }
+.does ul { padding: 0; margin: 0; }
+.meter { margin-top: 22px; display: grid; grid-template-columns: 120px 1fr 70px; gap: 12px; align-items: center; font-size: 17px; }
+.meter .bar { height: 16px; border-radius: 0 5px 5px 0; background: var(--neg); width: 0; transition: width 1.4s cubic-bezier(.3,.7,.2,1) 2.4s; }
+.s-ai.active .meter .bar.a { width: 24%; } .s-ai.active .meter .bar.b { width: 96%; transition-delay: 2.7s; }
+.meter .v { font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.meter .lab { color: var(--muted); }
+
+/* ---------- 5 new workflow ---------- */
+.lanes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 40px; flex: 1; }
+.lane { border-radius: 18px; padding: 26px 26px 20px; display: flex; flex-direction: column; }
+.lane.auto { background: var(--surface); border: 1px solid var(--line); }
+.lane.ai { background: var(--brass-soft); }
+.lane.human { background: var(--rail); color: var(--rail-ink); }
+.lane .who { font-size: 16px; font-weight: 600; margin-bottom: 6px; color: var(--muted); }
+.lane.human .who { color: var(--rail-muted); } .lane.ai .who { color: var(--brass); }
+.lane h3 { font-family: var(--display); font-size: 31px; font-weight: 600; letter-spacing: -.015em; margin: 0 0 16px; line-height: 1.12; }
+.lane ul { margin: 0; padding: 0; list-style: none; }
+.lane li { font-size: 18.5px; line-height: 1.4; padding: 11px 0; border-top: 1px solid rgba(19,33,28,.1); }
+.lane.human li { border-top-color: rgba(255,255,255,.12); }
+.lane li:first-child { border-top: 0; }
+.time-strip { display: flex; align-items: center; gap: 22px; margin-top: 22px; font-size: 20px; }
+.time-strip .before { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--neg); text-decoration-thickness: 2px; }
+.time-strip .after { font-family: var(--display); font-weight: 600; font-size: 26px; }
+.time-strip .arrow { color: var(--brass); font-size: 26px; }
+
+/* ---------- 6 use it ---------- */
+.use-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 46px; flex: 1; }
+.reasons { display: grid; gap: 26px; align-content: start; }
+.reason b { display: block; font-family: var(--display); font-size: 29px; font-weight: 600; letter-spacing: -.015em; margin-bottom: 4px; }
+.reason span { font-size: 19px; color: var(--ink-2); line-height: 1.45; }
+.conn { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 26px 28px; align-self: start; }
+.conn h3 { font-family: var(--display); font-size: 24px; font-weight: 600; margin: 0 0 14px; }
+.conn .row { display: grid; grid-template-columns: 34px 1fr auto; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); font-size: 18px; }
+.conn .row:first-of-type { border-top: 0; }
+.conn .glyph { width: 30px; height: 30px; font-size: 12px; }
+.ok { color: var(--good); font-weight: 600; font-size: 15px; } .later { color: var(--muted); font-size: 15px; }
+
+/* ---------- 7 demo ---------- */
+.demo-wrap { position: absolute; inset: 64px 96px 70px; display: flex; flex-direction: column; gap: 18px; }
+.demo-head { display: flex; align-items: baseline; justify-content: space-between; }
+.demo-head h2 { font-size: 44px; }
+.video-box { flex: 1; border-radius: 14px; overflow: hidden; background: #000; position: relative; box-shadow: 0 30px 80px rgba(0,0,0,.35); }
+.video-box video { width: 100%; height: 100%; object-fit: contain; display: block; background: #000; }
+.video-box .missing { position: absolute; inset: 0; display: grid; place-items: center; color: var(--rail-ink); font-size: 22px; text-align: center; padding: 40px; }
+.video-box .missing[hidden] { display: none; }
+.hint { font-size: 16px; color: var(--rail-muted); }
+
+/* ---------- 8 close ---------- */
+.s-close h1 { font-size: 104px; line-height: .95; letter-spacing: -.04em; max-width: 13ch; font-weight: 600; }
+.next { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; margin-top: auto; }
+.next div { border-top: 1px solid rgba(255,255,255,.2); padding-top: 16px; }
+.next b { display: block; font-size: 15px; color: var(--brass-hi); font-weight: 600; margin-bottom: 6px; }
+.next span { font-size: 21px; line-height: 1.4; }
+
+
+/* ---------- problem + target (v2) ---------- */
+.prob-grid { display: grid; grid-template-columns: 640px 1fr; gap: 70px; align-items: center; margin-top: 30px; }
+.hub { width: 640px; height: 420px; }
+.hub path { stroke-dasharray: 400; stroke-dashoffset: 400; transition: stroke-dashoffset 1.2s cubic-bezier(.3,.6,.2,1) .3s; }
+.s-prob.active .hub path { stroke-dashoffset: 0; }
+.hub .one { transform-origin: 380px 210px; transform: scale(.6); opacity: 0; transition: transform .6s cubic-bezier(.3,1.5,.5,1) 1.1s, opacity .4s 1.1s; }
+.s-prob.active .hub .one { transform: none; opacity: 1; }
+.jobs { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
+.jobs li { font-size: 27px; line-height: 1.3; padding: 16px 0; border-top: 1px solid var(--line); }
+.jobs li:first-child { border-top: 0; }
+.jobs b { font-weight: 600; color: #b2302f; }
+.s-prob .cost { margin-top: auto; font-family: var(--display); font-size: 30px; font-weight: 520; }
+.vs { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 50px; }
+.side { border-radius: 18px; padding: 30px 34px; }
+.side.chain { background: var(--surface); border: 1px solid var(--line); color: var(--ink-2); }
+.side.smb { background: var(--rail); color: var(--rail-ink); box-shadow: 0 0 0 3px var(--brass-hi); }
+.side .who { font-family: var(--display); font-size: 32px; font-weight: 600; letter-spacing: -.015em; line-height: 1.15; margin-bottom: 18px; color: var(--ink); }
+.side.smb .who { color: #fff; }
+.side ul { list-style: none; margin: 0; padding: 0; }
+.side li { font-size: 24px; line-height: 1.35; padding: 14px 0; border-top: 1px solid rgba(19,33,28,.1); }
+.side.smb li { border-top-color: rgba(255,255,255,.14); }
+.side li:first-child { border-top: 0; }
+.side.smb li:last-child { color: var(--brass-hi); font-weight: 600; }
+.lane li { font-size: 23px; padding: 14px 0; }
+.lanes { flex: none; margin-top: 46px; }
+.vs { margin-top: 46px; }
+.lane { padding: 30px 30px 24px; }
+.lane h3 { font-size: 34px; }
+.time-strip { margin-top: 40px; font-size: 22px; }
+.time-strip .after { font-size: 30px; }
+
+/* chrome: progress, counter, notes */
+.progress { position: fixed; left: 0; bottom: 0; height: 4px; background: var(--brass-hi); transition: width .4s; z-index: 5; }
+.counter { position: fixed; right: 18px; bottom: 12px; color: rgba(255,255,255,.5); font-size: 13px; z-index: 5; font-variant-numeric: tabular-nums; }
+.notes { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); width: min(900px, calc(100% - 32px)); background: rgba(10,18,15,.94); color: #e9efec; border-radius: 12px; padding: 14px 18px; font-size: 17px; line-height: 1.5; z-index: 10; display: none; box-shadow: 0 10px 40px rgba(0,0,0,.4); }
+.notes.show { display: block; }
+.notes small { display: block; color: #8fb0a5; margin-bottom: 4px; font-size: 13px; }
+
+.navctl { position: fixed; left: 16px; bottom: 14px; z-index: 6; display: flex; gap: 8px; opacity: .35; transition: opacity .25s; }
+.navctl:hover, body.mouse .navctl { opacity: 1; }
+.navctl button { width: 40px; height: 40px; border-radius: 10px; border: 1px solid rgba(255,255,255,.25); background: rgba(10,18,15,.75); color: #e9efec; display: grid; place-items: center; cursor: pointer; padding: 0; }
+.navctl button:hover { background: rgba(10,18,15,.95); }
+.navctl button:focus-visible { outline: 2px solid var(--brass-hi); outline-offset: 2px; }
+.navctl svg { width: 18px; height: 18px; }
+
+.help { position: fixed; top: 12px; right: 16px; color: rgba(255,255,255,.4); font-size: 12.5px; z-index: 5; }
+@media (prefers-reduced-motion: reduce) { * { transition-duration: 0s !important; transition-delay: 0s !important; } }
+</style>
+</head>
+<body>
+<div class="viewport"><div class="stage" id="stage">
+
+  <!-- 1 TITLE -->
+  <section class="slide dark s-title" data-notes="Hi, we're Loomin, a customer feedback analyzer for small and medium hotels and restaurants. We're in the Product Management track.">
+    <svg class="threads" viewBox="0 0 900 900" fill="none" aria-hidden="true">
+      <g stroke-width="2.5" stroke-linecap="round">
+        <path d="M0 120 C300 120 360 450 900 450" stroke="#8fb0a5"/>
+        <path d="M0 260 C320 260 380 450 900 450" stroke="#e66767"/>
+        <path d="M0 400 C300 400 420 450 900 450" stroke="#8fb0a5"/>
+        <path d="M0 540 C300 540 400 450 900 450" stroke="#6da7ec"/>
+        <path d="M0 680 C320 680 380 450 900 450" stroke="#8fb0a5"/>
+        <path d="M0 800 C340 800 360 450 900 450" stroke="#d5a84d"/>
+      </g>
+      <g class="knot"><circle cx="760" cy="450" r="34" stroke="#d5a84d" stroke-width="5"/><circle cx="760" cy="450" r="11" fill="#d5a84d"/></g>
+    </svg>
+    <div class="pad" style="justify-content:center">
+      <div class="in" style="--d:.2"><div class="track"><b>Track</b> AI for Product Management Workflows</div></div>
+      <h1 class="in" style="--d:.4;margin-top:34px">Loomin</h1>
+      <div class="sub in" style="--d:.6">Customer Feedback Analyzer</div>
+      <p class="line in" style="--d:.8">For small and medium hotels and restaurants, where reviews are a one-person job.</p>
+    </div>
+    <div class="foot"><span>Pioneering Minds AI: Hack for Impact</span><span>October 17, 2026</span></div>
+  </section>
+
+  <!-- 2 PROBLEM -->
+  <section class="slide s-prob" data-notes="At a small hotel or restaurant, handling reviews is a one-person job. The manager checks Google, Tripadvisor, Booking, Instagram and more, reads everything, spots what keeps coming up and replies, all on top of running the business. That takes hours every week, and problems get noticed late.">
+    <div class="pad">
+      <p class="kicker in">The problem</p>
+      <h2 class="in" style="--d:.1">At a small hotel or restaurant, reviews are a one-person job.</h2>
+      <div class="prob-grid">
+        <svg class="hub" viewBox="0 0 640 420" fill="none" aria-hidden="true">
+          <g stroke="#c3ccc7" stroke-width="2">
+            <path d="M120 40 C260 40 260 210 320 210"/><path d="M120 110 C250 110 260 210 320 210"/><path d="M120 180 C240 180 270 210 320 210"/>
+            <path d="M120 240 C240 240 270 210 320 210"/><path d="M120 310 C250 310 260 210 320 210"/><path d="M120 380 C260 380 260 210 320 210"/>
+          </g>
+          <g font-family="IBM Plex Sans, sans-serif" font-size="17" fill="#13211c">
+            <rect x="0" y="22" width="120" height="36" rx="9" fill="#fff" stroke="#d3dbd6"/><text x="60" y="46" text-anchor="middle">Google</text>
+            <rect x="0" y="92" width="120" height="36" rx="9" fill="#fff" stroke="#d3dbd6"/><text x="60" y="116" text-anchor="middle">Tripadvisor</text>
+            <rect x="0" y="162" width="120" height="36" rx="9" fill="#fff" stroke="#d3dbd6"/><text x="60" y="186" text-anchor="middle">Booking.com</text>
+            <rect x="0" y="222" width="120" height="36" rx="9" fill="#fff" stroke="#d3dbd6"/><text x="60" y="246" text-anchor="middle">Expedia</text>
+            <rect x="0" y="292" width="120" height="36" rx="9" fill="#fff" stroke="#d3dbd6"/><text x="60" y="316" text-anchor="middle">Instagram</text>
+            <rect x="0" y="362" width="120" height="36" rx="9" fill="#fff" stroke="#d3dbd6"/><text x="60" y="386" text-anchor="middle">TikTok</text>
+          </g>
+          <circle class="one" cx="380" cy="210" r="62" fill="#173a32"/>
+          <text x="380" y="204" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-size="34" font-weight="650" fill="#dfe9e4">1</text>
+          <text x="380" y="232" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="17" fill="#8fb0a5">manager</text>
+        </svg>
+        <ul class="jobs">
+          <li class="in" style="--d:.5">Read every review, on every site</li>
+          <li class="in" style="--d:.65">Spot what keeps coming up</li>
+          <li class="in" style="--d:.8">Reply to each guest</li>
+          <li class="in" style="--d:.95"><b>On top of running the business</b></li>
+        </ul>
+      </div>
+      <div class="cost in" style="--d:1.2">Hours every week, and problems get noticed late.</div>
+    </div>
+  </section>
+
+  <!-- 3 TARGET -->
+  <section class="slide" data-notes="Large chains have a whole team for this, plus enterprise tools that cost hundreds of dollars per location every month. Small and medium operators have one person and no budget for those tools. They're underserved, and that's exactly who we built Loomin for.">
+    <div class="pad" style="justify-content:center">
+      <p class="kicker in">Who it's for</p>
+      <h2 class="in" style="--d:.1">Chains have a team for this. Small operators have one manager.</h2>
+      <div class="vs">
+        <div class="side chain in" style="--d:.35">
+          <div class="who">Large hotel and restaurant chains</div>
+          <ul><li>A dedicated team reads and replies</li><li>Enterprise tools at $299–$800+ per location, per month</li><li>Already well served</li></ul>
+        </div>
+        <div class="side smb in" style="--d:.6">
+          <div class="who">Small and medium hotels and restaurants</div>
+          <ul><li>One manager does it alone</li><li>No budget for enterprise tools</li><li>Underserved, and that's our market</li></ul>
+        </div>
+      </div>
+      <p class="src in" style="--d:.9;margin-top:22px">Tool pricing from HotelTechReport and Costbench listings for Birdeye, Revinate and similar platforms</p>
+    </div>
+  </section>
+
+  <!-- 4 NEW WORKFLOW -->
+  <section class="slide" data-notes="With Loomin, collecting and tagging every review is automated. AI writes a morning brief, ranks what to fix first, and drafts replies. The manager stays in charge: they decide what to fix and approve every reply. Hours of reading become a five-minute morning check.">
+    <div class="pad" style="justify-content:center">
+      <p class="kicker in">Our solution</p>
+      <h2 class="in" style="--d:.1">Loomin does the reading. The manager makes the calls.</h2>
+      <div class="lanes">
+        <div class="lane auto in" style="--d:.3">
+          <div class="who">Automated</div>
+          <h3>Collect and tag</h3>
+          <ul><li>Pulls reviews and comments from every site</li><li>Reads each sentence for topic and sentiment</li></ul>
+        </div>
+        <div class="lane ai in" style="--d:.5">
+          <div class="who">AI drafts</div>
+          <h3>Brief, rank and reply</h3>
+          <ul><li>A plain-language morning brief</li><li>What to fix first, and reply drafts</li></ul>
+        </div>
+        <div class="lane human in" style="--d:.7">
+          <div class="who">The manager decides</div>
+          <h3>Judge and approve</h3>
+          <ul><li>Chooses what to fix</li><li>Approves every reply before it's posted</li></ul>
+        </div>
+      </div>
+      <div class="time-strip in" style="--d:1">
+        <span class="before">Hours a week across six sites</span><span class="arrow">→</span><span class="after">A five-minute morning check</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 DEMO -->
+  <section class="slide dark" data-notes="Here's how it works. [Press Space to play the demo.]">
+    <div class="demo-wrap">
+      <div class="demo-head"><h2>See it work</h2><span class="hint">Press Space or click to play the demo</span></div>
+      <div class="video-box" id="videoBox">
+        <video id="demoVideo" src="../video/loomin-demo.mp4" preload="auto" playsinline></video>
+        <div class="missing" id="videoMissing" hidden>Demo video not found next to this deck.<br>Open the live prototype instead.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 CLOSE -->
+  <section class="slide dark s-close" data-notes="Loomin: from hours of reading to the one thing to fix today. Next, we want to pilot with five local hotels and restaurants. Thank you, and we'd love your questions.">
+    <div class="pad">
+      <div class="logo in"><div class="logo-mark"><span></span></div>Loomin</div>
+      <h1 class="in" style="--d:.2;margin-top:56px">From hours of reading to the one thing to fix today.</h1>
+      <div class="next">
+        <div class="in" style="--d:.5"><b>Next</b><span>Pilot with five small hotels and restaurants</span></div>
+        <div class="in" style="--d:.65"><b>Then</b><span>Text alerts when a complaint starts to spike</span></div>
+        <div class="in" style="--d:.8"><b>Ask us</b><span>Questions, feedback, and introductions to owners</span></div>
+      </div>
+    </div>
+    <div class="foot"><span>Thank you</span><span>Loomin, Customer Feedback Analyzer</span></div>
+  </section>
+
+</div></div>
+<div class="progress" id="progress"></div>
+<div class="counter" id="counter"></div>
+<div class="navctl" id="navctl">
+  <button type="button" id="prevBtn" aria-label="Previous slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <button type="button" id="nextBtn" aria-label="Next slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 5l7 7-7 7"/></svg></button>
+  <button type="button" id="fsBtn" aria-label="Full screen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+</div>
+<div class="help">Arrow keys or buttons to move, N for notes, F for full screen</div>
+<div class="notes" id="notes"></div>
+
+<script>
+const slides = [...document.querySelectorAll(".slide")];
+const stage = document.getElementById("stage");
+let cur = 0;
+function fit() { const s = Math.min(innerWidth / 1600, innerHeight / 900); stage.style.transform = `translate(-50%, -50%) scale(${s})`; }
+addEventListener("resize", fit); fit();
+function show(i) {
+  cur = Math.max(0, Math.min(slides.length - 1, i));
+  slides.forEach((s, j) => s.classList.toggle("active", j === cur));
+  document.getElementById("progress").style.width = ((cur + 1) / slides.length * 100) + "%";
+  document.getElementById("counter").textContent = `${cur + 1} / ${slides.length}`;
+  document.getElementById("notes").innerHTML = `<small>Speaker notes, slide ${cur + 1}</small>${slides[cur].dataset.notes || ""}`;
+  const v = document.getElementById("demoVideo"); if (!slides[cur].contains(v)) v.pause();
+  if (location.hash !== "#" + (cur + 1)) history.replaceState(null, "", "#" + (cur + 1));
+}
+function replay() { const s = slides[cur]; s.classList.remove("active"); void s.offsetWidth; s.classList.add("active"); }
+window.addEventListener("keydown", e => {
+  if (e.target.closest && e.target.closest(".navctl") && (e.key === " " || e.key === "Enter")) return;
+  const v = document.getElementById("demoVideo"), onDemo = slides[cur].contains(v);
+  if (onDemo && (e.key === " " || e.key === "Enter")) { e.preventDefault(); v.paused ? v.play() : v.pause(); return; }
+  if (["ArrowRight", "ArrowDown", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); show(cur + 1); }
+  else if (["ArrowLeft", "ArrowUp", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); show(cur - 1); }
+  else if (e.key === "Home") show(0); else if (e.key === "End") show(slides.length - 1);
+  else if (e.key.toLowerCase() === "n") document.getElementById("notes").classList.toggle("show");
+  else if (e.key.toLowerCase() === "r") replay();
+  else if (e.key.toLowerCase() === "f") toggleFS();
+});
+document.getElementById("videoBox").addEventListener("click", e => { e.stopPropagation(); const v = document.getElementById("demoVideo"); v.paused ? v.play() : v.pause(); });
+document.getElementById("demoVideo").addEventListener("error", e => { if (e.target.readyState < 2) document.getElementById("videoMissing").hidden = false; });
+document.getElementById("demoVideo").addEventListener("loadeddata", () => { document.getElementById("videoMissing").hidden = true; });
+document.querySelector(".viewport").addEventListener("click", e => { if (e.target.closest("#videoBox")) return; show(cur + (e.clientX > innerWidth / 3 ? 1 : -1)); });
+
+function toggleFS() {
+  const d = document, el = d.documentElement;
+  if (d.fullscreenElement || d.webkitFullscreenElement) (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+  else { const r = (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el); r?.catch?.(() => {}); }
+  setTimeout(() => window.focus(), 50);
+}
+["fullscreenchange", "webkitfullscreenchange"].forEach(ev => document.addEventListener(ev, () => { window.focus(); document.body.focus({ preventScroll: true }); }));
+document.getElementById("prevBtn").addEventListener("click", e => { e.stopPropagation(); show(cur - 1); window.focus(); });
+document.getElementById("nextBtn").addEventListener("click", e => { e.stopPropagation(); show(cur + 1); window.focus(); });
+document.getElementById("fsBtn").addEventListener("click", e => { e.stopPropagation(); toggleFS(); });
+document.body.tabIndex = -1;
+addEventListener("pointerdown", () => window.focus());
+let mouseT; addEventListener("mousemove", () => { document.body.classList.add("mouse"); clearTimeout(mouseT); mouseT = setTimeout(() => document.body.classList.remove("mouse"), 1800); });
+window.focus(); document.body.focus({ preventScroll: true });
+const start = parseInt(location.hash.slice(1), 10);
+show(Number.isFinite(start) ? start - 1 : 0);
+</script>
+</body>
+</html>
