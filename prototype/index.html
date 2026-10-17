@@ -1,0 +1,1527 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loomin Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  color-scheme: light;
+  --paper: #eef2ef;
+  --surface: #fcfcfb;
+  --surface-2: #f4f7f5;
+  --ink: #13211c;
+  --ink-2: #47554f;
+  --muted: #76827d;
+  --line: #d9e0dc;
+  --line-strong: #c3ccc7;
+  --rail: #173a32;
+  --rail-ink: #dfe9e4;
+  --rail-muted: #8fb0a5;
+  --brass: #a87a22;
+  --brass-soft: #f3e7cc;
+  --pos: #2a78d6;
+  --pos-soft: #dbe9fa;
+  --neg: #e34948;
+  --neg-soft: #fbe0df;
+  --neu: #b9bdb9;
+  --good-text: #006300;
+  --critical: #d03b3b;
+  --focus: #2a78d6;
+  --shadow-pop: 0 18px 50px rgba(19, 33, 28, .18);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #0e1412;
+    --surface: #161e1b;
+    --surface-2: #1b2521;
+    --ink: #e8efeb;
+    --ink-2: #b4c0bb;
+    --muted: #84918b;
+    --line: #26312d;
+    --line-strong: #34413c;
+    --rail: #0b1e19;
+    --rail-ink: #dfe9e4;
+    --rail-muted: #7f9e94;
+    --brass: #d5a84d;
+    --brass-soft: #3a2f17;
+    --pos: #3987e5;
+    --pos-soft: #17304f;
+    --neg: #e66767;
+    --neg-soft: #4a1f1f;
+    --neu: #55605b;
+    --good-text: #0ca30c;
+    --critical: #e66767;
+    --focus: #6da7ec;
+    --shadow-pop: 0 18px 50px rgba(0, 0, 0, .5);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #0e1412;
+  --surface: #161e1b;
+  --surface-2: #1b2521;
+  --ink: #e8efeb;
+  --ink-2: #b4c0bb;
+  --muted: #84918b;
+  --line: #26312d;
+  --line-strong: #34413c;
+  --rail: #0b1e19;
+  --rail-ink: #dfe9e4;
+  --rail-muted: #7f9e94;
+  --brass: #d5a84d;
+  --brass-soft: #3a2f17;
+  --pos: #3987e5;
+  --pos-soft: #17304f;
+  --neg: #e66767;
+  --neg-soft: #4a1f1f;
+  --neu: #55605b;
+  --good-text: #0ca30c;
+  --critical: #e66767;
+  --focus: #6da7ec;
+  --shadow-pop: 0 18px 50px rgba(0, 0, 0, .5);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font: 15px/1.5 "IBM Plex Sans", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 4px; }
+.display { font-family: "Bricolage Grotesque", system-ui, sans-serif; }
+.tab-nums { font-variant-numeric: tabular-nums; }
+
+/* ---------- shell ---------- */
+.app { display: grid; grid-template-columns: 216px 1fr; min-height: 100vh; }
+.rail {
+  background: var(--rail); color: var(--rail-ink);
+  display: flex; flex-direction: column; padding: 22px 14px; gap: 4px;
+  position: sticky; top: env(safe-area-inset-top, 0px); height: 100vh;
+}
+.logo { display: flex; align-items: center; gap: 10px; padding: 0 8px 22px; }
+.logo-mark {
+  width: 30px; height: 30px; border-radius: 50%;
+  border: 2px solid var(--brass); display: grid; place-items: center;
+}
+.logo-mark span { width: 10px; height: 10px; border-radius: 50%; background: var(--brass); }
+.logo-word { font-family: "Bricolage Grotesque", sans-serif; font-weight: 650; font-size: 21px; letter-spacing: -.01em; }
+.nav-btn {
+  display: flex; align-items: center; gap: 11px; width: 100%;
+  background: none; border: 0; color: var(--rail-muted); text-align: left;
+  padding: 9px 10px; border-radius: 8px; font-weight: 500;
+}
+.nav-btn svg { width: 18px; height: 18px; flex: none; }
+.nav-btn:hover { color: var(--rail-ink); background: rgba(255,255,255,.05); }
+.nav-btn[aria-current="page"] { color: var(--rail-ink); background: rgba(255,255,255,.09); }
+.nav-btn .count {
+  margin-left: auto; font-size: 12px; background: var(--brass); color: #1b1404;
+  border-radius: 10px; padding: 0 7px; font-weight: 600;
+}
+.rail-foot { margin-top: auto; font-size: 13px; color: var(--rail-muted); padding: 8px 10px; }
+.rail-foot button { background: none; border: 1px solid rgba(255,255,255,.15); color: var(--rail-ink); border-radius: 8px; padding: 6px 10px; width: 100%; margin-top: 8px; }
+
+.main { min-width: 0; }
+.topbar {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 14px 28px; border-bottom: 1px solid var(--line);
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(8px); position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20;
+}
+.biz-select {
+  appearance: none; border: 1px solid var(--line-strong); background: var(--surface);
+  border-radius: 8px; padding: 7px 34px 7px 12px; font-weight: 600;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2376827d' stroke-width='1.6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+}
+.seg { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.seg button { border: 0; background: none; padding: 6px 12px; color: var(--ink-2); font-size: 14px; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.live { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-2); margin-left: auto; }
+.live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--good-text); position: relative; }
+.live-dot::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 2px solid var(--good-text); opacity: 0; animation: ping 2.4s infinite; }
+@keyframes ping { 0% { transform: scale(.4); opacity: .7; } 80%,100% { transform: scale(1.4); opacity: 0; } }
+.ask-btn {
+  display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line-strong);
+  background: var(--surface); border-radius: 8px; padding: 6px 10px 6px 12px; font-weight: 500;
+}
+.kbd { font-size: 12px; color: var(--muted); border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; }
+
+.view { padding: 26px 28px 60px; max-width: 1320px; }
+.view[hidden] { display: none; }
+
+/* ---------- panels ---------- */
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; min-width: 0; }
+.panel-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
+.panel-title { font-family: "Bricolage Grotesque", sans-serif; font-size: 18px; font-weight: 620; margin: 0; letter-spacing: -.005em; }
+.panel-sub { color: var(--muted); font-size: 13px; }
+.panel-head .right { margin-left: auto; }
+.link-btn { background: none; border: 0; color: var(--pos); padding: 0; font-weight: 500; font-size: 14px; }
+.link-btn:hover { text-decoration: underline; }
+
+/* ---------- overview: brief ---------- */
+.brief-grid { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 28px; align-items: start; margin-bottom: 26px; }
+.brief-date { color: var(--muted); font-size: 14px; margin: 0 0 10px; }
+.brief-headline {
+  font-family: "Bricolage Grotesque", sans-serif; font-weight: 560;
+  font-size: clamp(30px, 3.4vw, 46px); line-height: 1.08; letter-spacing: -.022em;
+  margin: 0 0 16px; max-width: 18ch; text-wrap: balance;
+}
+.brief-body { font-size: 17px; color: var(--ink-2); max-width: 58ch; margin: 0 0 18px; }
+.brief-body strong { color: var(--ink); font-weight: 600; }
+.brief-meta { display: flex; gap: 18px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.brief-meta b { color: var(--ink); font-weight: 600; }
+
+.fix { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.fix-head { padding: 14px 18px 12px; }
+.fix-head .panel-sub { display: block; margin-top: 2px; }
+.fix ol { list-style: none; margin: 0; padding: 0; counter-reset: fix; }
+.fix li { border-top: 1px solid var(--line); }
+.fix-item { display: grid; grid-template-columns: 30px 1fr; gap: 4px 10px; padding: 13px 18px; background: none; border: 0; width: 100%; text-align: left; }
+.fix-item:hover { background: var(--surface-2); }
+.fix-num { font-family: "Bricolage Grotesque", sans-serif; font-weight: 650; font-size: 22px; color: var(--brass); line-height: 1.1; grid-row: span 2; }
+.fix-title { font-weight: 600; }
+.fix-why { font-size: 13.5px; color: var(--ink-2); }
+.fix-why .up { color: var(--critical); font-weight: 600; white-space: nowrap; }
+
+/* ---------- KPI strip ---------- */
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 12px; background: var(--surface); margin-bottom: 22px; }
+.kpi { padding: 16px 20px; border-left: 1px solid var(--line); }
+.kpi:first-child { border-left: 0; }
+.kpi-label { font-size: 13px; color: var(--ink-2); }
+.kpi-value { font-family: "Bricolage Grotesque", sans-serif; font-size: 34px; font-weight: 600; line-height: 1.15; letter-spacing: -.02em; }
+.kpi-value small { font-size: 16px; color: var(--muted); font-weight: 500; letter-spacing: 0; }
+.kpi-delta { font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+.kpi-delta.bad { color: var(--critical); }
+.kpi-delta.good { color: var(--good-text); }
+.kpi-delta svg { width: 12px; height: 12px; }
+
+.grid-2 { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 20px; margin-bottom: 20px; }
+.grid-2b { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
+
+/* ---------- charts ---------- */
+.chart-wrap { position: relative; }
+.chart-wrap svg { display: block; width: 100%; overflow: visible; }
+.axis-text { font-size: 11px; fill: var(--muted); font-variant-numeric: tabular-nums; }
+.grid-line { stroke: var(--line); stroke-width: 1; }
+.base-line { stroke: var(--line-strong); stroke-width: 1; }
+.tooltip {
+  position: absolute; pointer-events: none; z-index: 5; background: var(--ink); color: var(--surface);
+  font-size: 12.5px; line-height: 1.4; padding: 7px 10px; border-radius: 7px; white-space: nowrap;
+  opacity: 0; transform: translate(-50%, calc(-100% - 10px)); transition: opacity .12s;
+}
+.tooltip.show { opacity: 1; }
+.tooltip b { font-weight: 600; }
+.legend { display: flex; gap: 14px; font-size: 12.5px; color: var(--ink-2); flex-wrap: wrap; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+
+/* topic index */
+.topics { display: grid; grid-template-columns: 112px 1fr 1fr 70px; column-gap: 0; row-gap: 2px; align-items: center; }
+.topic-row { display: contents; }
+.topic-row > * { padding: 5px 0; cursor: pointer; }
+.topic-row:hover > * { background: var(--surface-2); }
+.topic-name { font-size: 14px; font-weight: 500; padding-left: 6px !important; border-radius: 6px 0 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.topic-bar-neg, .topic-bar-pos { display: flex; align-items: center; gap: 6px; height: 30px; }
+.topic-bar-neg { justify-content: flex-end; border-right: 1px solid var(--line-strong); padding-right: 1px !important; }
+.topic-bar-pos { padding-left: 1px !important; }
+.bar { height: 14px; min-width: 2px; }
+.topic-bar-neg .bar { background: var(--neg); border-radius: 4px 0 0 4px; }
+.topic-bar-pos .bar { background: var(--pos); border-radius: 0 4px 4px 0; }
+.bar-num { font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.topic-trend { font-size: 12px; display: flex; align-items: center; justify-content: flex-end; gap: 3px; height: 40px; padding-right: 6px !important; border-radius: 0 6px 6px 0; color: var(--muted); white-space: nowrap; }
+.topic-trend.up { color: var(--critical); font-weight: 600; }
+.topics-scale { display: grid; grid-template-columns: 112px 1fr 1fr 70px; font-size: 12px; color: var(--muted); margin-top: 6px; }
+.topics-scale span:nth-child(2) { text-align: right; padding-right: 8px; }
+.topics-scale span:nth-child(3) { padding-left: 8px; }
+
+/* sources */
+.src-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.src-table th { text-align: left; font-weight: 500; color: var(--muted); font-size: 12.5px; padding: 0 0 8px; }
+.src-table td { padding: 9px 0; border-top: 1px solid var(--line); vertical-align: middle; }
+.src-table td.num, .src-table th.num { text-align: right; font-variant-numeric: tabular-nums; padding-right: 12px; }
+.stack { display: flex; gap: 2px; height: 10px; width: 100%; min-width: 70px; }
+.stack span { display: block; height: 100%; }
+.stack span:first-child { border-radius: 4px 0 0 4px; }
+.stack span:last-child { border-radius: 0 4px 4px 0; }
+.src-name { display: flex; align-items: center; gap: 9px; font-weight: 500; }
+.src-glyph { width: 22px; height: 22px; border-radius: 6px; display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #fff; flex: none; }
+
+/* feed */
+.feed { display: flex; flex-direction: column; }
+.review { border-top: 1px solid var(--line); padding: 14px 0; }
+.review:first-child { border-top: 0; padding-top: 2px; }
+.review.fresh { animation: fresh 2.6s ease-out; }
+@keyframes fresh { 0% { background: var(--brass-soft); } 100% { background: transparent; } }
+.review-top { display: flex; align-items: center; gap: 9px; margin-bottom: 6px; flex-wrap: wrap; }
+.review-author { font-weight: 600; font-size: 14px; }
+.review-when { color: var(--muted); font-size: 13px; }
+.stars { color: var(--brass); letter-spacing: 1px; font-size: 13px; }
+.stars .off { color: var(--line-strong); }
+.score10 { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.pill { font-size: 12px; border-radius: 20px; padding: 1px 9px; font-weight: 500; white-space: nowrap; }
+.pill.pos { background: var(--pos-soft); color: var(--pos); }
+.pill.neg { background: var(--neg-soft); color: var(--neg); }
+.pill.mixed { background: var(--surface-2); color: var(--ink-2); border: 1px solid var(--line); }
+.pill.new { background: var(--brass); color: #1b1404; }
+.review-text { margin: 0 0 8px; max-width: 72ch; }
+mark { background: none; color: inherit; padding: 0 1px; border-radius: 3px; }
+mark.p { background: var(--pos-soft); box-shadow: inset 0 -2px 0 var(--pos); }
+mark.n { background: var(--neg-soft); box-shadow: inset 0 -2px 0 var(--neg); }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.chip { border: 1px solid var(--line-strong); background: none; border-radius: 6px; font-size: 12.5px; padding: 1px 8px; color: var(--ink-2); }
+.chip:hover { border-color: var(--ink-2); color: var(--ink); }
+.review-actions { margin-left: auto; display: flex; gap: 8px; }
+.btn { border: 1px solid var(--line-strong); background: var(--surface); border-radius: 8px; padding: 5px 12px; font-size: 13.5px; font-weight: 500; }
+.btn:hover { border-color: var(--ink-2); }
+.btn.primary { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+.btn.primary:hover { opacity: .9; }
+.btn:disabled { opacity: .4; cursor: default; }
+.replied { font-size: 12.5px; color: var(--good-text); display: inline-flex; gap: 4px; align-items: center; }
+.reply-box { margin-top: 10px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+.reply-box textarea { width: 100%; min-height: 110px; border: 1px solid var(--line); border-radius: 8px; padding: 10px; background: var(--surface); resize: vertical; line-height: 1.5; }
+.reply-box .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px; align-items: center; }
+.reply-box .note { font-size: 12.5px; color: var(--muted); margin-right: auto; }
+
+/* reviews page */
+.filters { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+.filters select, .filters input { border: 1px solid var(--line-strong); background: var(--surface); border-radius: 8px; padding: 6px 10px; font-size: 14px; }
+.filters input { min-width: 220px; }
+.filter-note { font-size: 13px; color: var(--muted); }
+.page-title { font-family: "Bricolage Grotesque", sans-serif; font-weight: 600; font-size: 30px; letter-spacing: -.02em; margin: 0 0 4px; }
+.page-sub { color: var(--ink-2); margin: 0 0 22px; max-width: 70ch; }
+
+/* social */
+.social-summary { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 0; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); margin-bottom: 20px; }
+.posts { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 20px; }
+.post { display: grid; grid-template-columns: 116px 1fr; gap: 16px; }
+.thumb { aspect-ratio: 9/14; border-radius: 10px; position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 8px; color: #fff; font-size: 11.5px; font-weight: 600; }
+.thumb svg { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 34px; height: 34px; opacity: .9; }
+.post h3 { margin: 0 0 4px; font-size: 16px; font-weight: 600; }
+.post .meta { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.q-list { margin: 10px 0 0; padding: 0; list-style: none; font-size: 13.5px; }
+.q-list li { padding: 6px 0; border-top: 1px dashed var(--line-strong); display: flex; gap: 8px; align-items: baseline; }
+.q-list li span { flex: 1; color: var(--ink-2); }
+
+/* sources page */
+.src-group-title { font-family: "Bricolage Grotesque", sans-serif; font-weight: 600; font-size: 19px; margin: 6px 0 12px; }
+.src-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; margin-bottom: 26px; }
+.src-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.src-card .top { display: flex; align-items: center; gap: 10px; }
+.src-card .top .src-glyph { width: 34px; height: 34px; border-radius: 9px; font-size: 14px; }
+.src-card h3 { margin: 0; font-size: 16px; font-weight: 600; }
+.src-card .how { font-size: 13px; color: var(--ink-2); }
+.src-card .status { font-size: 13px; display: flex; align-items: center; gap: 6px; color: var(--muted); }
+.src-card .status.on { color: var(--good-text); }
+.src-card .foot { margin-top: auto; display: flex; align-items: center; gap: 8px; }
+.progress { height: 6px; border-radius: 4px; background: var(--line); overflow: hidden; }
+.progress span { display: block; height: 100%; width: 0; background: var(--pos); transition: width .3s; }
+
+/* drawer + chat */
+.scrim { position: fixed; inset: 0; background: rgba(10, 20, 16, .35); z-index: 40; opacity: 0; pointer-events: none; transition: opacity .2s; }
+.scrim.show { opacity: 1; pointer-events: auto; }
+.drawer {
+  position: fixed; top: 0; right: 0; height: 100%; width: min(440px, 100%); z-index: 50;
+  background: var(--surface); border-left: 1px solid var(--line); box-shadow: var(--shadow-pop);
+  transform: translateX(104%); transition: transform .26s cubic-bezier(.2,.8,.2,1);
+  display: flex; flex-direction: column;
+}
+.drawer.open { transform: none; }
+.drawer-head { display: flex; align-items: center; gap: 10px; padding: 16px 18px; border-bottom: 1px solid var(--line); }
+.drawer-head h2 { margin: 0; font-family: "Bricolage Grotesque", sans-serif; font-size: 20px; font-weight: 620; }
+.icon-btn { margin-left: auto; background: none; border: 0; width: 32px; height: 32px; border-radius: 8px; display: grid; place-items: center; color: var(--ink-2); }
+.icon-btn:hover { background: var(--surface-2); }
+.drawer-body { flex: 1; overflow: auto; padding: 18px; }
+.msg { margin-bottom: 14px; max-width: 92%; font-size: 14.5px; }
+.msg.me { margin-left: auto; background: var(--ink); color: var(--surface); padding: 8px 12px; border-radius: 12px 12px 3px 12px; width: fit-content; }
+.msg.bot { color: var(--ink); }
+.msg.bot p { margin: 0 0 8px; }
+.msg.bot ul, .msg.bot ol { margin: 0 0 8px; padding-left: 20px; }
+.msg.bot li { margin-bottom: 4px; }
+.msg.bot blockquote { margin: 6px 0; padding: 4px 10px; border-left: 3px solid var(--line-strong); color: var(--ink-2); font-size: 13.5px; }
+.cmds { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 14px; }
+.cmd { border: 1px solid var(--line-strong); background: var(--surface-2); border-radius: 6px; padding: 3px 9px; font-size: 13px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+.cmd:hover { border-color: var(--ink-2); }
+.chat-form { border-top: 1px solid var(--line); padding: 12px; position: relative; }
+.chat-form input { width: 100%; border: 1px solid var(--line-strong); border-radius: 10px; padding: 11px 12px; background: var(--surface); }
+.suggest { position: absolute; left: 12px; right: 12px; bottom: calc(100% - 4px); background: var(--surface); border: 1px solid var(--line-strong); border-radius: 10px; box-shadow: var(--shadow-pop); padding: 6px; display: none; }
+.suggest.show { display: block; }
+.suggest button { display: flex; gap: 10px; width: 100%; text-align: left; background: none; border: 0; padding: 7px 9px; border-radius: 7px; font-size: 13.5px; }
+.suggest button[aria-selected="true"], .suggest button:hover { background: var(--surface-2); }
+.suggest code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-weight: 600; min-width: 92px; }
+.suggest span { color: var(--muted); }
+.typing span { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--muted); margin-right: 3px; animation: blink 1s infinite; }
+.typing span:nth-child(2) { animation-delay: .15s; } .typing span:nth-child(3) { animation-delay: .3s; }
+@keyframes blink { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
+
+.topic-detail .big { font-family: "Bricolage Grotesque", sans-serif; font-size: 28px; font-weight: 600; letter-spacing: -.02em; line-height: 1.15; margin: 0 0 6px; }
+.topic-detail h3 { font-size: 14px; font-weight: 600; margin: 20px 0 8px; }
+.topic-detail .action { background: var(--brass-soft); border-radius: 10px; padding: 12px 14px; font-size: 14px; }
+
+/* modal */
+.modal { position: fixed; inset: 0; z-index: 60; display: none; place-items: center; padding: 16px; }
+.modal.show { display: grid; }
+.modal-card { position: relative; z-index: 1; background: var(--surface); border-radius: 14px; width: min(420px, 100%); padding: 22px; box-shadow: var(--shadow-pop); border: 1px solid var(--line); }
+.modal-card h3 { margin: 0 0 6px; font-family: "Bricolage Grotesque", sans-serif; font-size: 21px; font-weight: 620; }
+.modal-card p { margin: 0 0 14px; color: var(--ink-2); font-size: 14px; }
+.modal-steps { list-style: none; margin: 0 0 16px; padding: 0; font-size: 14px; }
+.modal-steps li { display: flex; gap: 10px; align-items: center; padding: 7px 0; color: var(--muted); }
+.modal-steps li.done { color: var(--ink); }
+.modal-steps li.active { color: var(--ink); font-weight: 500; }
+.modal-steps .tick { width: 18px; height: 18px; border-radius: 50%; border: 1.5px solid var(--line-strong); display: grid; place-items: center; flex: none; }
+.modal-steps li.done .tick { background: var(--good-text); border-color: var(--good-text); color: #fff; }
+.modal-steps li.active .tick { border-color: var(--pos); border-top-color: transparent; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 30px); opacity: 0; z-index: 70; background: var(--ink); color: var(--surface); padding: 10px 16px; border-radius: 10px; font-size: 14px; transition: all .25s; box-shadow: var(--shadow-pop); display: flex; gap: 10px; align-items: center; max-width: calc(100% - 32px); }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast button { background: none; border: 0; color: var(--brass); font-weight: 600; padding: 0; }
+
+
+/* ---------- sign in ---------- */
+.auth { position: fixed; inset: 0; z-index: 90; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); background: var(--paper); transition: opacity .5s ease, visibility .5s; }
+.auth.gone { opacity: 0; visibility: hidden; }
+.auth-brand { background: var(--rail); color: var(--rail-ink); padding: 48px 56px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden; }
+.auth-brand .logo { padding: 0; }
+.auth-brand h2 { font-family: "Bricolage Grotesque", sans-serif; font-weight: 560; font-size: clamp(30px, 3.4vw, 46px); line-height: 1.08; letter-spacing: -.02em; margin: 0 0 16px; max-width: 14ch; text-wrap: balance; }
+.auth-brand p { color: var(--rail-muted); max-width: 40ch; margin: 0; font-size: 16px; }
+.threads { position: absolute; right: -60px; top: 50%; width: 460px; height: 460px; transform: translateY(-50%); opacity: .55; pointer-events: none; }
+.auth-quote { border-left: 2px solid var(--brass); padding-left: 14px; font-size: 14px; color: var(--rail-ink); max-width: 44ch; }
+.auth-quote mark.n { color: inherit; }
+.auth-panel { display: grid; place-items: center; padding: 32px 24px; }
+.auth-card { width: min(380px, 100%); }
+.auth-card h1 { font-family: "Bricolage Grotesque", sans-serif; font-size: 28px; font-weight: 620; letter-spacing: -.015em; margin: 0 0 4px; }
+.auth-card .sub { color: var(--ink-2); margin: 0 0 24px; }
+.field { display: grid; gap: 6px; margin-bottom: 14px; font-size: 14px; font-weight: 500; }
+.field input { border: 1px solid var(--line-strong); background: var(--surface); border-radius: 10px; padding: 11px 12px; font-size: 15px; }
+.auth-row { display: flex; justify-content: space-between; align-items: center; font-size: 13.5px; color: var(--ink-2); margin: -2px 0 18px; }
+.auth-row label { display: flex; gap: 6px; align-items: center; }
+.btn-lg { width: 100%; padding: 11px 14px; font-size: 15px; border-radius: 10px; }
+.or { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; margin: 16px 0; }
+.or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.auth-foot { font-size: 12.5px; color: var(--muted); margin-top: 22px; }
+.sync-list { list-style: none; padding: 0; margin: 0 0 18px; display: grid; gap: 2px; }
+.sync-list li { display: grid; grid-template-columns: 26px 1fr auto; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); font-size: 14.5px; color: var(--muted); }
+.sync-list li:first-child { border-top: 0; }
+.sync-list li.done { color: var(--ink); }
+.sync-list .cnt { font-variant-numeric: tabular-nums; font-size: 13.5px; }
+.sync-list .ok { color: var(--good-text); font-weight: 600; margin-left: 6px; }
+.sync-step[hidden] { display: none; }
+@media (max-width: 760px) {
+  .auth { grid-template-columns: 1fr; overflow: auto; }
+  .auth-brand { padding: 28px 20px; gap: 18px; }
+  .auth-brand .threads, .auth-quote { display: none; }
+}
+
+
+/* ---------- guided tour (used to record the demo) ---------- */
+.tour-cursor { position: fixed; left: 50%; top: 110%; z-index: 300; width: 26px; height: 26px; pointer-events: none; transition: left .75s cubic-bezier(.45,.05,.2,1), top .75s cubic-bezier(.45,.05,.2,1); filter: drop-shadow(0 3px 6px rgba(0,0,0,.3)); }
+.tour-cursor svg { width: 26px; height: 26px; transition: transform .12s; }
+.tour-cursor.press svg { transform: scale(.82); }
+.tour-cursor::after { content: ""; position: absolute; left: -9px; top: -9px; width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--brass); opacity: 0; }
+.tour-cursor.press::after { animation: clickring .5s ease-out; }
+@keyframes clickring { 0% { opacity: .9; transform: scale(.4); } 100% { opacity: 0; transform: scale(1.8); } }
+.tour-caption { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 290; max-width: min(860px, calc(100% - 48px)); background: rgba(19,33,28,.9); color: #f2f6f4; font-size: 19px; line-height: 1.4; padding: 12px 20px; border-radius: 12px; text-align: center; opacity: 0; transition: opacity .3s; pointer-events: none; }
+.tour-caption.show { opacity: 1; }
+.tour-spot { box-shadow: 0 0 0 3px var(--brass), 0 0 0 9px color-mix(in srgb, var(--brass) 25%, transparent) !important; border-radius: 12px; transition: box-shadow .3s; }
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 1100px) {
+  .brief-grid, .grid-2, .grid-2b { grid-template-columns: 1fr; }
+  .posts { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; }
+  .rail { position: fixed; bottom: 0; top: auto; left: 0; right: 0; height: auto; flex-direction: row; padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px)); z-index: 30; justify-content: space-around; }
+  .logo, .rail-foot { display: none; }
+  .nav-btn { flex-direction: column; gap: 2px; font-size: 11px; padding: 6px 4px; width: auto; flex: 1; align-items: center; }
+  .nav-btn .count { display: none; }
+  .topbar { padding: 10px 16px; position: static; gap: 8px; }
+  .toast { bottom: 84px; }
+  .ask-btn .kbd { display: none; }
+  .live { margin-left: 0; order: 5; width: 100%; }
+  .view { padding: 18px 16px 90px; }
+  .kpis { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .kpi:nth-child(3) { border-left: 0; }
+  .kpi:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .topics, .topics-scale { grid-template-columns: 84px 1fr 1fr 44px; }
+  .social-summary { grid-template-columns: 1fr; }
+  .social-summary .kpi { border-left: 0; border-top: 1px solid var(--line); }
+  .social-summary .kpi:first-child { border-top: 0; }
+  .post { grid-template-columns: 84px 1fr; }
+  .filters input { min-width: 0; flex: 1; }
+  .review-actions { margin-left: 0; width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+<div class="auth" id="auth">
+  <div class="auth-brand">
+    <div class="logo"><div class="logo-mark" aria-hidden="true"><span></span></div><div class="logo-word">Loomin</div></div>
+    <svg class="threads" viewBox="0 0 400 400" aria-hidden="true" fill="none">
+      <g stroke-width="1.5" stroke-linecap="round">
+        <path d="M0 60 C120 60 160 200 400 200" stroke="#8fb0a5"/><path d="M0 120 C130 120 170 200 400 200" stroke="#e66767"/>
+        <path d="M0 180 C120 180 180 200 400 200" stroke="#8fb0a5"/><path d="M0 240 C120 240 170 200 400 200" stroke="#6da7ec"/>
+        <path d="M0 300 C130 300 160 200 400 200" stroke="#8fb0a5"/><path d="M0 350 C140 350 160 200 400 200" stroke="#d5a84d"/>
+      </g>
+    </svg>
+    <div>
+      <h2>Every review, woven into one clear picture.</h2>
+      <p>Loomin reads what guests say on every site and tells you what to fix first.</p>
+    </div>
+    <div class="auth-quote">“Lovely lobby and the front desk team were great, but <mark class="n">the Wi-Fi in room 312 dropped every few minutes</mark>.”</div>
+  </div>
+  <div class="auth-panel">
+    <form class="auth-card sync-step" id="signinForm" autocomplete="off">
+      <h1>Sign in</h1>
+      <p class="sub">Welcome back to The Linden Harbor Hotel.</p>
+      <div class="field"><label for="authEmail">Work email</label><input id="authEmail" type="email" value="alex@lindenharbor.example"></div>
+      <div class="field"><label for="authPass">Password</label><input id="authPass" type="password" value="demo-password"></div>
+      <div class="auth-row"><label><input type="checkbox" checked> Keep me signed in</label><span>Demo account</span></div>
+      <button class="btn primary btn-lg" type="submit" id="signinBtn">Sign in</button>
+      <div class="or">or</div>
+      <button class="btn btn-lg" type="button" id="googleBtn">Continue with Google</button>
+      <p class="auth-foot">This is a prototype. Sign-in is simulated and any details work.</p>
+    </form>
+    <div class="auth-card sync-step" id="syncStep" hidden>
+      <h1>Catching up on your reviews</h1>
+      <p class="sub" id="syncSub">Checking 6 connected sources for anything new.</p>
+      <ul class="sync-list" id="syncList"></ul>
+      <div class="progress" aria-hidden="true"><span id="syncBar"></span></div>
+      <p class="auth-foot" id="syncFoot">Reading every sentence for sentiment and topics.</p>
+    </div>
+  </div>
+</div>
+<div class="app">
+  <nav class="rail" aria-label="Main">
+    <div class="logo"><div class="logo-mark" aria-hidden="true"><span></span></div><div class="logo-word">Loomin</div></div>
+    <button class="nav-btn" data-view="overview" aria-current="page">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 13h6V4H4zM14 20h6v-9h-6zM14 4h6v4h-6zM4 20h6v-3H4z"/></svg>Overview</button>
+    <button class="nav-btn" data-view="reviews">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/></svg>Reviews <span class="count" id="navUnanswered">0</span></button>
+    <button class="nav-btn" data-view="social">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M10.5 9.5v5l4-2.5z" fill="currentColor"/></svg>Social</button>
+    <button class="nav-btn" data-view="sources">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M9 7V3M15 7V3M7 7h10v4a5 5 0 0 1-10 0zM12 16v5"/></svg>Sources</button>
+    <div class="rail-foot">
+      <div id="railBizKind">48-room boutique hotel</div>
+      <button id="themeBtn" type="button">Switch to dark</button>
+      <button id="signoutBtn" type="button">Sign out</button>
+    </div>
+  </nav>
+
+  <div class="main">
+    <header class="topbar">
+      <label class="sr-only" for="bizSelect">Business</label>
+      <select class="biz-select" id="bizSelect">
+        <option value="hotel">The Linden Harbor Hotel</option>
+        <option value="resto">Marrow &amp; Vine</option>
+      </select>
+      <div class="seg" role="group" aria-label="Date range">
+        <button type="button" data-range="7" aria-pressed="false">7 days</button>
+        <button type="button" data-range="30" aria-pressed="true">30 days</button>
+        <button type="button" data-range="90" aria-pressed="false">90 days</button>
+      </div>
+      <div class="live" aria-live="polite"><span class="live-dot" aria-hidden="true"></span><span id="syncText">Live from 6 sources, synced just now</span></div>
+      <button class="ask-btn" id="askBtn" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z"/></svg>
+        Ask your reviews <span class="kbd">/</span></button>
+    </header>
+
+    <!-- OVERVIEW -->
+    <section class="view" id="view-overview" aria-label="Overview">
+      <div class="brief-grid">
+        <div>
+          <p class="brief-date" id="briefDate"></p>
+          <h1 class="brief-headline" id="briefHeadline"></h1>
+          <p class="brief-body" id="briefBody"></p>
+          <div class="brief-meta" id="briefMeta"></div>
+        </div>
+        <div class="fix">
+          <div class="fix-head"><h2 class="panel-title">Fix first</h2><span class="panel-sub">Ranked by how many guests it affects and how fast it is growing</span></div>
+          <ol id="fixList"></ol>
+        </div>
+      </div>
+
+      <div class="kpis" id="kpis"></div>
+
+      <div class="grid-2">
+        <div class="panel">
+          <div class="panel-head">
+            <h2 class="panel-title">Sentiment score</h2>
+            <span class="panel-sub">Share of positive mentions, 0 to 100, per day</span>
+          </div>
+          <div class="chart-wrap" id="trendChart"></div>
+          <div class="chart-wrap" id="volChart" style="margin-top:6px"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2 class="panel-title">Where reviews come from</h2></div>
+          <table class="src-table" id="srcTable"></table>
+          <div class="legend" style="margin-top:12px"><span><i style="background:var(--pos)"></i>Positive</span><span><i style="background:var(--neu)"></i>Neutral</span><span><i style="background:var(--neg)"></i>Negative</span></div>
+        </div>
+      </div>
+
+      <div class="grid-2b">
+        <div class="panel">
+          <div class="panel-head">
+            <h2 class="panel-title">Keyword index</h2>
+            <span class="panel-sub">What guests talk about, by mentions</span>
+            <div class="legend right"><span><i style="background:var(--neg)"></i>Negative</span><span><i style="background:var(--pos)"></i>Positive</span></div>
+          </div>
+          <div class="chart-wrap"><div class="topics" id="topics"></div><div class="tooltip" id="topicTip"></div></div>
+          <div class="topics-scale"><span></span><span>Negative mentions</span><span>Positive mentions</span><span style="text-align:right">vs prior</span></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head">
+            <h2 class="panel-title">Live feed</h2>
+            <span class="panel-sub">Reviews and comments as they arrive</span>
+            <button class="link-btn right" data-goto="reviews" type="button">All reviews</button>
+          </div>
+          <div class="feed" id="liveFeed"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="view" id="view-reviews" aria-label="Reviews" hidden>
+      <h1 class="page-title">Reviews and comments</h1>
+      <p class="page-sub">Every review from every connected site in one list. Highlights show which phrases drove the sentiment.</p>
+      <div class="filters">
+        <label class="sr-only" for="fSource">Source</label>
+        <select id="fSource"></select>
+        <label class="sr-only" for="fSent">Sentiment</label>
+        <select id="fSent"><option value="">All sentiment</option><option value="neg">Negative</option><option value="mixed">Mixed</option><option value="pos">Positive</option></select>
+        <label class="sr-only" for="fTopic">Topic</label>
+        <select id="fTopic"></select>
+        <label class="sr-only" for="fUnanswered">Reply status</label>
+        <select id="fUnanswered"><option value="">Answered and not</option><option value="1">Needs a reply</option></select>
+        <label class="sr-only" for="fSearch">Search</label>
+        <input id="fSearch" type="search" placeholder="Search words, like towels or parking">
+        <span class="filter-note" id="fCount"></span>
+      </div>
+      <div class="panel"><div class="feed" id="allFeed"></div></div>
+    </section>
+
+    <!-- SOCIAL -->
+    <section class="view" id="view-social" aria-label="Social" hidden>
+      <h1 class="page-title">Comments on your posts</h1>
+      <p class="page-sub" id="socialSub"></p>
+      <div class="social-summary" id="socialSummary"></div>
+      <div class="posts" id="posts"></div>
+    </section>
+
+    <!-- SOURCES -->
+    <section class="view" id="view-sources" aria-label="Sources" hidden>
+      <h1 class="page-title">Connected sources</h1>
+      <p class="page-sub">Sign in once and new reviews and comments flow in on their own. No exports, no spreadsheets.</p>
+      <h2 class="src-group-title">Review sites</h2>
+      <div class="src-grid" id="srcReviewGrid"></div>
+      <h2 class="src-group-title">Social accounts</h2>
+      <div class="src-grid" id="srcSocialGrid"></div>
+    </section>
+  </div>
+</div>
+
+<!-- chat drawer -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="chatDrawer" aria-label="Ask your reviews" aria-hidden="true">
+  <div class="drawer-head">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brass)" stroke-width="1.8" aria-hidden="true"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/></svg>
+    <h2>Ask your reviews</h2>
+    <button class="icon-btn" data-close type="button" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <div class="drawer-body" id="chatLog"></div>
+  <form class="chat-form" id="chatForm" autocomplete="off">
+    <div class="suggest" id="suggest" role="listbox"></div>
+    <label class="sr-only" for="chatInput">Message</label>
+    <input id="chatInput" placeholder="Ask anything, or type / for commands">
+  </form>
+</aside>
+
+<!-- topic drawer -->
+<aside class="drawer" id="topicDrawer" aria-label="Topic detail" aria-hidden="true">
+  <div class="drawer-head"><h2 id="topicDrawerTitle">Topic</h2>
+    <button class="icon-btn" data-close type="button" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="drawer-body topic-detail" id="topicDrawerBody"></div>
+</aside>
+
+<!-- connect modal -->
+<div class="modal" id="connectModal" role="dialog" aria-modal="true" aria-labelledby="connectTitle">
+  <div class="scrim show" data-close-modal></div>
+  <div class="modal-card">
+    <h3 id="connectTitle">Connect</h3>
+    <p id="connectDesc"></p>
+    <ol class="modal-steps" id="connectSteps"></ol>
+    <div class="progress" aria-hidden="true"><span id="connectBar"></span></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px">
+      <button class="btn" type="button" data-close-modal>Cancel</button>
+      <button class="btn primary" type="button" id="connectDone" disabled>Done</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ============================================================
+   Loomin prototype. All data below is made up for the demo.
+   ============================================================ */
+const TODAY = new Date();
+const DAY = 864e5;
+
+const SOURCES = {
+  google:      { name: "Google",      glyph: "G",  color: "#2a78d6", kind: "review", how: "Official Google Business Profile API. You sign in as the owner." },
+  tripadvisor: { name: "Tripadvisor", glyph: "T",  color: "#1baf7a", kind: "review", how: "Tripadvisor API under a partner agreement." },
+  booking:     { name: "Booking.com", glyph: "B",  color: "#256abf", kind: "review", how: "Booking.com Guest Reviews API, through a certified connectivity partner." },
+  expedia:     { name: "Expedia",     glyph: "E",  color: "#c98500", kind: "review", how: "Expedia Group partner API (guest reviews)." },
+  yelp:        { name: "Yelp",        glyph: "Y",  color: "#e34948", kind: "review", how: "Yelp Fusion API, paid plan." },
+  opentable:   { name: "OpenTable",   glyph: "O",  color: "#d95926", kind: "review", how: "OpenTable partner API, approved per restaurant." },
+  instagram:   { name: "Instagram",   glyph: "IG", color: "#d55181", kind: "social", how: "Instagram Graph API. Comments on your own posts." },
+  tiktok:      { name: "TikTok",      glyph: "TT", color: "#13211c", kind: "social", how: "TikTok for Business API. Comments on your own videos." },
+  youtube:     { name: "YouTube",     glyph: "YT", color: "#d03b3b", kind: "social", how: "YouTube Data API. Comments on your channel." },
+  facebook:    { name: "Facebook",    glyph: "f",  color: "#6250d6", kind: "social", how: "Facebook Pages API. Comments and recommendations." }
+};
+
+/* Review text markup: {+phrase+} positive, {-phrase-} negative */
+const BIZ = {
+  hotel: {
+    name: "The Linden Harbor Hotel", kind: "48-room boutique hotel", guest: "guests",
+    connected: ["google", "tripadvisor", "booking", "expedia", "instagram", "tiktok"],
+    rating: 4.3, ratingPrev: 4.5, unansweredBase: 21,
+    event: { daysAgo: 18, label: "First Wi-Fi complaints" },
+    trend: { base: 81, dip: 13, dipStart: 18, recover: 3 },
+    sourceSplit: { google: [412, 4.4, .72, .12], tripadvisor: [268, 4.2, .66, .14], booking: [301, 4.1, .63, .17], expedia: [122, 4.3, .70, .13], instagram: [545, null, .84, .11], tiktok: [286, null, .79, .15] },
+    brief: {
+      headline: "Guests love your staff and the rooftop. Wi-Fi complaints have quadrupled.",
+      body: d => `<strong>58 reviews mentioned Wi-Fi in the last 30 days</strong>, up from 14 the month before, and most name rooms on floors 3 and 4. The trouble started around ${d(18)}. Construction noise is the second-fastest-growing complaint, and it is pulling Booking.com scores down the most.`,
+      meta: [["1,934", "reviews and comments read"], ["6", "sources"], ["12 sec", "since last sync"]]
+    },
+    fixes: [
+      { topic: "wifi", title: "Fix Wi-Fi on floors 3 and 4", why: "Named in 1 of every 6 reviews this month.", up: "4.1× vs last month" },
+      { topic: "noise", title: "Warn guests about construction noise", why: "Drilling from 7am is in 37 reviews. Offer harbor-side rooms first.", up: "2.6×" },
+      { topic: "breakfast", title: "Restock the breakfast buffet after 9am", why: "Cold eggs and empty pastry trays come up after 9:15.", up: "1.4×" }
+    ],
+    topics: [
+      { key: "staff", label: "Staff", pos: 212, neg: 14, prev: 16, action: "Keep doing what you're doing. Share the praise with the front desk team; Maya and Luis are named most." },
+      { key: "location", label: "Location", pos: 180, neg: 9, prev: 10, action: "Lead with location in your listing photos and descriptions." },
+      { key: "clean", label: "Cleanliness", pos: 120, neg: 22, prev: 20, action: "Stable. Two mentions of dusty vents on floor 2 are worth a check." },
+      { key: "rooftop", label: "Rooftop bar", pos: 88, neg: 6, prev: 5, action: "Guests and non-guests ask about access. Add rooftop hours to your Google profile." },
+      { key: "breakfast", label: "Breakfast", pos: 96, neg: 41, prev: 29, action: "Complaints cluster after 9:15am. Add a second refill round for eggs and pastries." },
+      { key: "value", label: "Value", pos: 70, neg: 33, prev: 27, action: "Value complaints usually come with Wi-Fi or noise. Fixing those should lift this too." },
+      { key: "checkin", label: "Check-in", pos: 64, neg: 29, prev: 24, action: "Lines peak at 3–4pm. Add a second agent at the desk during that hour." },
+      { key: "wifi", label: "Wi-Fi", pos: 12, neg: 58, prev: 14, action: "Rooms 301–318 and 401–416 are named most. Have the access points on floors 3 and 4 checked; post a status note at check-in until fixed." },
+      { key: "noise", label: "Noise", pos: 8, neg: 37, prev: 14, action: "Tell guests about the construction at booking and check-in, and assign harbor-side rooms first." },
+      { key: "parking", label: "Parking", pos: 10, neg: 26, prev: 24, action: "Guests find the garage entrance hard to find. Add directions to the pre-arrival email." }
+    ],
+    reviews: [
+      { src: "tripadvisor", author: "Maya R.", rating: 2, ago: 1, sent: "neg", topics: ["wifi", "noise", "staff"], replied: false, text: "Lovely lobby and {+the front desk team were great+}, but {-the Wi-Fi in room 312 dropped every few minutes-}. I couldn't take a single work call from the room. {-Jackhammers next door started at 7am-} too." },
+      { src: "google", author: "Tom B.", rating: 5, ago: 1, sent: "pos", topics: ["location", "rooftop"], replied: false, text: "{+Best location in the harbor district+}. We walked everywhere. {+The rooftop bar at sunset is worth the stay on its own.+}" },
+      { src: "booking", author: "Danielle K.", rating: 3, score10: "6.0", ago: 2, sent: "mixed", topics: ["clean", "breakfast"], replied: false, text: "{+Room was spotless+} and the bed was very comfortable. {-Breakfast was disappointing: eggs were cold by 9:30-} and {-the pastries had run out-}." },
+      { src: "google", author: "Arjun P.", rating: 1, ago: 3, sent: "neg", topics: ["noise", "checkin"], replied: true, text: "{-Booked a quiet room and got one facing the construction site.-} {-Nobody at check-in mentioned it.-} Asked to move and was told the hotel was full." },
+      { src: "expedia", author: "Lena S.", rating: 4, ago: 3, sent: "mixed", topics: ["staff", "wifi"], replied: false, text: "{+Staff went out of their way to store our bags and recommend dinner.+} {-Wi-Fi was slow in the room-} but fine in the lobby." },
+      { src: "tripadvisor", author: "Chris and Jo", rating: 5, ago: 4, sent: "pos", topics: ["staff", "rooftop"], replied: true, text: "Anniversary weekend. {+They left a handwritten note and a bottle of prosecco.+} {+The rooftop views are incredible.+}" },
+      { src: "google", author: "Marcus T.", rating: 3, ago: 5, sent: "mixed", topics: ["parking", "value", "staff"], replied: false, text: "{+Great spot, friendly team.+} {-$28 a night for parking is steep-}, and {-the garage entrance is hard to find-}." },
+      { src: "booking", author: "Sofia L.", rating: 5, score10: "9.0", ago: 6, sent: "pos", topics: ["checkin", "clean"], replied: true, text: "{+Check-in took two minutes+} and {+the room was clean and bright+}. Would stay again." },
+      { src: "tripadvisor", author: "Ben W.", rating: 2, ago: 7, sent: "neg", topics: ["wifi", "value"], replied: true, text: "{-Paid $310 a night and the Wi-Fi didn't work at all on the 4th floor.-} {-For this price I expect better.-}" },
+      { src: "google", author: "Priya N.", rating: 4, ago: 8, sent: "mixed", topics: ["breakfast"], replied: false, text: "{+Breakfast had great local coffee+}, {-but the buffet felt picked over by 9.-}" },
+      { src: "expedia", author: "Hannah G.", rating: 5, ago: 9, sent: "pos", topics: ["clean", "location"], replied: true, text: "{+Housekeeping was spotless every day.+} {+The location can't be beat.+}" },
+      { src: "google", author: "Omar F.", rating: 2, ago: 10, sent: "neg", topics: ["noise"], replied: false, text: "{-Construction noise from 7am every single day.-} The hotel should warn guests when they book." },
+      { src: "tripadvisor", author: "Elise M.", rating: 4, ago: 12, sent: "mixed", topics: ["rooftop", "checkin"], replied: true, text: "{+Rooftop cocktails were excellent.+} {-The check-in line at 3pm took 20 minutes-}." },
+      { src: "booking", author: "Kenji A.", rating: 4, score10: "7.5", ago: 14, sent: "mixed", topics: ["staff", "wifi"], replied: false, text: "{+Friendly staff+}, {-unreliable Wi-Fi-}, {+great bed+}." }
+    ],
+    incoming: [
+      { src: "google", author: "Rachel D.", rating: 2, sent: "neg", topics: ["wifi", "staff"], text: "{-The Wi-Fi in 305 kept cutting out during my meeting.-} {+Staff offered me the business lounge, which helped.+}" },
+      { src: "instagram", author: "@sam.travels", sent: "pos", topics: ["rooftop"], question: true, text: "{+Obsessed with this view+} 😍 is the rooftop open to non-guests?" },
+      { src: "booking", author: "Ines V.", rating: 3, score10: "6.5", sent: "mixed", topics: ["noise", "breakfast"], text: "{-Woken up by drilling at 7:15.-} {+Breakfast was good though.+}" },
+      { src: "tripadvisor", author: "Will H.", rating: 5, sent: "pos", topics: ["rooftop", "staff"], text: "{+Sunset at the rooftop bar was the highlight of our trip.+} {+Ask for Luis at the bar.+}" },
+      { src: "tiktok", author: "@foodie.nomad", sent: "pos", topics: ["breakfast"], question: true, text: "{+the breakfast spread looks amazing+} how much is it for non-guests?" },
+      { src: "expedia", author: "Paul C.", rating: 4, sent: "mixed", topics: ["clean", "parking"], text: "{+Very clean, great location.+} {-Parking is pricey.-}" }
+    ],
+    posts: [
+      { src: "instagram", title: "Sunset from the rooftop bar", ago: 3, comments: 412, split: [.88, .09, .03], themes: ["The view", "Cocktails", "Non-guest access"], tint: "#a87a22", questions: ["Is the rooftop open to non-guests?", "Can you reserve a table for Friday?", "What time does the bar close?"], qCount: 14 },
+      { src: "tiktok", title: "48 hours in the harbor district", ago: 6, comments: 286, split: [.79, .15, .06], themes: ["Location", "Price", "Parking"], tint: "#173a32", questions: ["How much per night in December?", "Is parking included?"], qCount: 9 },
+      { src: "instagram", title: "Our breakfast spread", ago: 9, comments: 133, split: [.71, .19, .10], themes: ["Breakfast", "Coffee", "Runs out early"], tint: "#256abf", questions: ["Is breakfast included with the room?"], qCount: 4, worry: "Looks great but it was empty when we got there at 9:30" },
+      { src: "tiktok", title: "Room tour: the Harbor King", ago: 15, comments: 58, split: [.64, .22, .14], themes: ["Room size", "Noise", "View"], tint: "#47554f", questions: ["Is the construction still going?"], qCount: 3, worry: "Heard the construction is loud, is it still going?" }
+    ]
+  },
+
+  resto: {
+    name: "Marrow & Vine", kind: "90-seat neighborhood restaurant", guest: "diners",
+    connected: ["google", "yelp", "opentable", "tripadvisor", "instagram", "tiktok"],
+    rating: 4.4, ratingPrev: 4.5, unansweredBase: 17,
+    event: { daysAgo: 24, label: "Weekend wait complaints begin" },
+    trend: { base: 79, dip: 9, dipStart: 24, recover: 1 },
+    sourceSplit: { google: [538, 4.5, .74, .10], yelp: [244, 4.0, .58, .14], opentable: [397, 4.5, .76, .11], tripadvisor: [96, 4.4, .72, .12], instagram: [744, null, .87, .09], tiktok: [1104, null, .85, .11] },
+    brief: {
+      headline: "Diners rave about the food. Weekend wait times are costing you stars.",
+      body: d => `<strong>62 reviews complained about waiting in the last 30 days</strong>, and 8 in 10 of them were about Friday or Saturday between 7 and 9pm, often from guests with a reservation. It started around ${d(24)}. The short rib and the miso caramel tart are your most-praised dishes.`,
+      meta: [["3,123", "reviews and comments read"], ["6", "sources"], ["9 sec", "since last sync"]]
+    },
+    fixes: [
+      { topic: "wait", title: "Cut Friday and Saturday wait times", why: "62 complaints, mostly 7–9pm, many with reservations.", up: "3.1× vs last month" },
+      { topic: "portion", title: "Review main course portions", why: "Mains at $34 are called small in 31 reviews.", up: "1.6×" },
+      { topic: "reserve", title: "Hold reserved tables on time", why: "21 diners with bookings waited 20+ minutes.", up: "2.2×" }
+    ],
+    topics: [
+      { key: "food", label: "Food quality", pos: 240, neg: 18, prev: 17, action: "Your strongest asset. Feature the short rib and tart in posts and listings." },
+      { key: "staff", label: "Staff", pos: 150, neg: 12, prev: 13, action: "Nina is named in 23 reviews. Recognize her and share the praise." },
+      { key: "cocktails", label: "Cocktails", pos: 98, neg: 7, prev: 6, action: "Stable and strong. Worth a happy-hour push on weeknights." },
+      { key: "dessert", label: "Desserts", pos: 77, neg: 5, prev: 4, action: "The miso caramel tart video drove 1,104 comments. Add it to the lunch menu, people are asking." },
+      { key: "patio", label: "Patio", pos: 60, neg: 9, prev: 8, action: "Commenters ask if it's dog friendly. Answer once in your profile." },
+      { key: "value", label: "Price", pos: 52, neg: 44, prev: 33, action: "Price complaints usually come with portion complaints." },
+      { key: "portion", label: "Portion size", pos: 35, neg: 31, prev: 19, action: "Pasta and the hanger steak are called small most often." },
+      { key: "wait", label: "Wait times", pos: 40, neg: 62, prev: 20, action: "Complaints cluster Friday and Saturday 7–9pm. Stagger reservations every 15 minutes and add a runner on weekends." },
+      { key: "reserve", label: "Reservations", pos: 30, neg: 21, prev: 10, action: "Tables are being given away when a party runs late. Hold reserved tables for 15 minutes." },
+      { key: "noise", label: "Noise", pos: 14, neg: 28, prev: 25, action: "Mostly at peak times. Acoustic panels are a later fix." }
+    ],
+    reviews: [
+      { src: "yelp", author: "Jess L.", rating: 2, ago: 1, sent: "mixed", topics: ["food", "wait", "reserve"], replied: false, text: "{+The short rib was incredible+}, but {-we waited 50 minutes for a table we had reserved-} and {-another 30 for our mains.-}" },
+      { src: "google", author: "Andre M.", rating: 5, ago: 1, sent: "pos", topics: ["cocktails", "staff"], replied: false, text: "{+Best cocktails in the neighborhood.+} {+Our server Nina was fantastic.+}" },
+      { src: "opentable", author: "Karen W.", rating: 3, ago: 2, sent: "mixed", topics: ["patio", "portion", "value"], replied: false, text: "{+Lovely patio.+} {-The mains felt small for $34.-}" },
+      { src: "google", author: "Diego S.", rating: 1, ago: 3, sent: "neg", topics: ["wait"], replied: true, text: "{-Friday night was chaos. 25 minutes before anyone took our order.-}" },
+      { src: "tripadvisor", author: "Mei C.", rating: 5, ago: 4, sent: "pos", topics: ["dessert", "staff"], replied: true, text: "{+The miso caramel tart is a must.+} {+Staff were warm and attentive.+}" },
+      { src: "yelp", author: "Rob T.", rating: 3, ago: 5, sent: "mixed", topics: ["food", "noise"], replied: false, text: "{+Food was excellent+}, {-but it was too loud to hold a conversation-}." },
+      { src: "opentable", author: "Laura P.", rating: 4, ago: 6, sent: "mixed", topics: ["food", "value"], replied: true, text: "{+Great tasting menu+}, {-a bit pricey-}." },
+      { src: "google", author: "Sam O.", rating: 2, ago: 7, sent: "neg", topics: ["wait", "reserve", "food"], replied: false, text: "{-Saturday wait was over an hour even with a reservation.-} {+The food almost made up for it.+}" },
+      { src: "yelp", author: "Nadia F.", rating: 5, ago: 9, sent: "pos", topics: ["cocktails", "dessert"], replied: true, text: "{+Cocktails and desserts are top tier.+}" },
+      { src: "google", author: "Tyler J.", rating: 4, ago: 10, sent: "mixed", topics: ["food", "portion"], replied: false, text: "{+Delicious+}, {-but the pasta portions are tiny-}." },
+      { src: "opentable", author: "Grace H.", rating: 5, ago: 12, sent: "pos", topics: ["patio", "staff"], replied: true, text: "{+Patio dinner on a warm night, perfect service.+}" },
+      { src: "tripadvisor", author: "Felix B.", rating: 2, ago: 13, sent: "neg", topics: ["reserve", "staff"], replied: false, text: "{-Our booked table wasn't ready and nobody apologized.-}" }
+    ],
+    incoming: [
+      { src: "yelp", author: "Aisha K.", rating: 2, sent: "mixed", topics: ["wait", "food"], text: "{-45-minute wait on a Saturday, again.-} {+The short rib is still great.+}" },
+      { src: "instagram", author: "@eatwithmo", sent: "pos", topics: ["food"], question: true, text: "{+that short rib+} 🤤 do you take walk-ins?" },
+      { src: "google", author: "Ben R.", rating: 5, sent: "pos", topics: ["staff"], text: "{+Nina is the best server in town.+}" },
+      { src: "opentable", author: "Claire D.", rating: 3, sent: "mixed", topics: ["portion", "dessert"], text: "{-Mains were small for the price.-} {+Desserts were lovely.+}" },
+      { src: "tiktok", author: "@nightout.local", sent: "pos", topics: ["patio"], question: true, text: "{+need to try this patio+} is it dog friendly?" }
+    ],
+    posts: [
+      { src: "tiktok", title: "Miso caramel tart, start to finish", ago: 2, comments: 1104, split: [.87, .10, .03], themes: ["Dessert", "Lunch menu", "Recipe requests"], tint: "#a87a22", questions: ["Is this on the lunch menu?", "Can I order it for pickup?", "Do you do birthday cakes?"], qCount: 22 },
+      { src: "instagram", title: "Short rib, 12 hours in the making", ago: 5, comments: 530, split: [.91, .07, .02], themes: ["Short rib", "Walk-ins", "Date night"], tint: "#7a2e22", questions: ["Do you take walk-ins?", "Is there a vegetarian version?"], qCount: 18 },
+      { src: "instagram", title: "Patio season is here", ago: 8, comments: 214, split: [.82, .14, .04], themes: ["Patio", "Dogs", "Heaters"], tint: "#173a32", questions: ["Is the patio dog friendly?"], qCount: 7 },
+      { src: "tiktok", title: "Our new fall menu", ago: 12, comments: 96, split: [.58, .20, .22], themes: ["New dishes", "Wait times", "Price"], tint: "#47554f", questions: ["Are reservations needed on Sundays?"], qCount: 5, worry: "Hope the wait is better than last time, we left after an hour" }
+    ]
+  }
+};
+
+/* ---------- state ---------- */
+const state = { biz: "hotel", range: 30, view: "overview", feed: [], incomingIdx: 0, replied: {}, extraUnanswered: 0, connected: {} };
+for (const k of Object.keys(BIZ)) state.connected[k] = new Set(BIZ[k].connected);
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const markup = t => esc(t).replace(/\{\+(.+?)\+\}/g, '<mark class="p">$1</mark>').replace(/\{-(.+?)-\}/g, '<mark class="n">$1</mark>');
+const plain = t => t.replace(/\{[+-](.+?)[+-]\}/g, "$1");
+const fmtDate = (daysAgo, opts = { month: "short", day: "numeric" }) => new Date(TODAY - daysAgo * DAY).toLocaleDateString("en-US", opts);
+const nf = n => n.toLocaleString("en-US");
+const B = () => BIZ[state.biz];
+const topicOf = key => B().topics.find(t => t.key === key);
+function mulberry(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const whenText = ago => ago === 0 ? "Just now" : ago === 1 ? "Yesterday" : `${ago} days ago`;
+const arrowUp = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 2l4 5H2z" fill="currentColor"/></svg>';
+const arrowDown = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M6 10L2 5h8z" fill="currentColor"/></svg>';
+
+/* ---------- trend data (seeded so it looks the same every time) ---------- */
+function buildTrend(key) {
+  const t = BIZ[key].trend, rnd = mulberry(key === "hotel" ? 7 : 19), out = [];
+  for (let d = 89; d >= 0; d--) {
+    const date = new Date(TODAY - d * DAY);
+    const weekend = [5, 6].includes(date.getDay());
+    let dip = d <= t.dipStart ? t.dip * Math.min(1, (t.dipStart - d + 1) / 6) : 0;
+    if (d <= 4) dip -= t.recover;
+    if (key === "resto" && weekend && d <= t.dipStart) dip += 5;
+    const score = Math.round(Math.max(40, Math.min(97, t.base - dip + Math.sin(d / 6) * 1.6 + (rnd() - .5) * 6)));
+    const vol = Math.round((key === "hotel" ? 7 : 10) + rnd() * 6 + (weekend ? 5 : 0) + (d <= t.dipStart ? 3 : 0));
+    out.push({ d, date, score, vol });
+  }
+  return out;
+}
+const TREND = { hotel: buildTrend("hotel"), resto: buildTrend("resto") };
+
+/* ---------- render: brief, fixes, KPIs ---------- */
+function renderBrief() {
+  const b = B();
+  $("#briefDate").textContent = `Morning brief for ${b.name}, ${fmtDate(0, { weekday: "long", month: "long", day: "numeric" })}`;
+  $("#briefHeadline").textContent = b.brief.headline;
+  $("#briefBody").innerHTML = b.brief.body(d => fmtDate(d, { month: "long", day: "numeric" }));
+  $("#briefMeta").innerHTML = b.brief.meta.map(([v, l]) => `<span><b>${v}</b> ${l}</span>`).join("");
+  $("#fixList").innerHTML = b.fixes.map((f, i) => `
+    <li><button class="fix-item" type="button" data-topic="${f.topic}">
+      <span class="fix-num">${i + 1}</span>
+      <span class="fix-title">${esc(f.title)}</span>
+      <span class="fix-why">${esc(f.why)} <span class="up">${arrowUp.replace('aria-hidden="true"', 'aria-hidden="true" width="10" height="10"')} ${esc(f.up)}</span></span>
+    </button></li>`).join("");
+  $("#railBizKind").textContent = b.kind;
+}
+
+function windowStats() {
+  const tr = TREND[state.biz], n = state.range;
+  const cur = tr.slice(-n), prev = tr.slice(-2 * n, -n);
+  const avg = a => a.reduce((s, x) => s + x.score, 0) / a.length;
+  const sum = a => a.reduce((s, x) => s + x.vol, 0);
+  return { score: Math.round(avg(cur.slice(-7))), scorePrev: Math.round(avg(prev.length ? prev.slice(-7) : cur.slice(0, 7))), vol: sum(cur), volPrev: sum(prev) };
+}
+function unansweredCount() {
+  const b = B();
+  return b.unansweredBase + state.extraUnanswered - Object.keys(state.replied).filter(k => k.startsWith(state.biz)).length;
+}
+function renderKPIs() {
+  const b = B(), s = windowStats();
+  const dScore = s.score - s.scorePrev, dRating = +(b.rating - b.ratingPrev).toFixed(1);
+  const volPct = s.volPrev ? Math.round((s.vol / s.volPrev - 1) * 100) : 0;
+  const delta = (v, txt, goodWhenUp) => {
+    if (v === 0) return `<div class="kpi-delta">No change ${txt}</div>`;
+    const good = goodWhenUp ? v > 0 : v < 0;
+    return `<div class="kpi-delta ${good ? "good" : "bad"}">${v > 0 ? arrowUp : arrowDown} ${Math.abs(v)}${txt}</div>`;
+  };
+  const un = unansweredCount();
+  $("#kpis").innerHTML = `
+    <div class="kpi"><div class="kpi-label">Sentiment score, last 7 days</div><div class="kpi-value">${s.score}<small> / 100</small></div>${delta(dScore, " pts vs prior week", true)}</div>
+    <div class="kpi"><div class="kpi-label">Average rating, all sites</div><div class="kpi-value">${b.rating.toFixed(1)}<small> / 5</small></div>${delta(dRating, " vs last month", true)}</div>
+    <div class="kpi"><div class="kpi-label">New reviews and comments</div><div class="kpi-value">${nf(s.vol)}</div><div class="kpi-delta">${volPct >= 0 ? "Up" : "Down"} ${Math.abs(volPct)}% vs prior ${state.range} days</div></div>
+    <div class="kpi"><div class="kpi-label">Waiting for a reply</div><div class="kpi-value">${un}</div><div class="kpi-delta"><button class="link-btn" type="button" data-goto="reviews" data-unanswered="1">Reply now</button></div></div>`;
+  $("#navUnanswered").textContent = un;
+}
+
+/* ---------- render: trend chart (hand-built SVG) ---------- */
+function renderTrend() {
+  const el = $("#trendChart"), vEl = $("#volChart");
+  const data = TREND[state.biz].slice(-state.range);
+  const W = Math.max(320, el.clientWidth), H = 220, pad = { l: 30, r: 10, t: 14, b: 22 };
+  const yMin = 50, yMax = 100;
+  const x = i => pad.l + (i / (data.length - 1)) * (W - pad.l - pad.r);
+  const y = v => pad.t + (1 - (v - yMin) / (yMax - yMin)) * (H - pad.t - pad.b);
+  let g = "";
+  for (const v of [50, 60, 70, 80, 90, 100]) g += `<line class="grid-line" x1="${pad.l}" x2="${W - pad.r}" y1="${y(v)}" y2="${y(v)}"/><text class="axis-text" x="${pad.l - 6}" y="${y(v) + 4}" text-anchor="end">${v}</text>`;
+  const step = Math.ceil(data.length / 6);
+  data.forEach((p, i) => { if (i % step === 0 || i === data.length - 1) g += `<text class="axis-text" x="${x(i)}" y="${H - 4}" text-anchor="${i === 0 ? "start" : i === data.length - 1 ? "end" : "middle"}">${i === data.length - 1 ? "Today" : fmtDate(p.d)}</text>`; });
+  const path = data.map((p, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(p.score).toFixed(1)}`).join("");
+  const area = `${path}L${x(data.length - 1)},${y(yMin)}L${x(0)},${y(yMin)}Z`;
+  const ev = B().event, ei = data.findIndex(p => p.d === ev.daysAgo);
+  let evMark = "";
+  if (ei >= 0) {
+    const ex = x(ei), right = ex > W * .6;
+    evMark = `<line x1="${ex}" x2="${ex}" y1="${pad.t}" y2="${H - pad.b}" stroke="var(--brass)" stroke-width="1.5" stroke-dasharray="3 3"/>
+      <circle cx="${ex}" cy="${pad.t + 2}" r="4" fill="var(--brass)"/>
+      <text x="${right ? ex - 8 : ex + 8}" y="${pad.t + 6}" text-anchor="${right ? "end" : "start"}" style="font-size:12px;font-weight:600;fill:var(--ink)">${esc(ev.label)}, ${fmtDate(ev.daysAgo)}</text>`;
+  }
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" height="${H}" role="img" aria-label="Daily sentiment score for the last ${state.range} days">
+    <defs><linearGradient id="ga" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--pos)" stop-opacity=".16"/><stop offset="1" stop-color="var(--pos)" stop-opacity="0"/></linearGradient></defs>
+    ${g}<path d="${area}" fill="url(#ga)"/>${evMark}
+    <path d="${path}" fill="none" stroke="var(--pos)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <line id="xh" y1="${pad.t}" y2="${H - pad.b}" stroke="var(--ink-2)" stroke-width="1" opacity="0"/>
+    <circle id="xd" r="5" fill="var(--pos)" stroke="var(--surface)" stroke-width="2" opacity="0"/>
+    <rect x="${pad.l}" y="0" width="${W - pad.l - pad.r}" height="${H}" fill="transparent" id="hit"/>
+  </svg><div class="tooltip" id="trendTip"></div>`;
+
+  // volume small multiple, same x
+  const VH = 64, vmax = Math.max(...data.map(p => p.vol));
+  const bw = Math.max(2, (W - pad.l - pad.r) / data.length - 2);
+  let bars = "";
+  data.forEach((p, i) => { const h = (p.vol / vmax) * (VH - 18); bars += `<rect x="${x(i) - bw / 2}" y="${VH - 4 - h}" width="${bw}" height="${h}" rx="${Math.min(2, bw / 2)}" fill="var(--neu)"/>`; });
+  vEl.innerHTML = `<svg viewBox="0 0 ${W} ${VH}" height="${VH}" role="img" aria-label="Reviews per day"><text class="axis-text" x="${pad.l}" y="10">Reviews and comments per day</text>${bars}<line class="base-line" x1="${pad.l}" x2="${W - pad.r}" y1="${VH - 4}" y2="${VH - 4}"/></svg>`;
+
+  const svg = el.querySelector("svg"), tip = $("#trendTip"), xh = $("#xh"), xd = $("#xd");
+  const move = e => {
+    const r = svg.getBoundingClientRect(), mx = (e.clientX - r.left) * (W / r.width);
+    const i = Math.max(0, Math.min(data.length - 1, Math.round((mx - pad.l) / (W - pad.l - pad.r) * (data.length - 1))));
+    const p = data[i];
+    xh.setAttribute("x1", x(i)); xh.setAttribute("x2", x(i)); xh.setAttribute("opacity", .35);
+    xd.setAttribute("cx", x(i)); xd.setAttribute("cy", y(p.score)); xd.setAttribute("opacity", 1);
+    tip.innerHTML = `<b>${fmtDate(p.d, { weekday: "short", month: "short", day: "numeric" })}</b><br>Score ${p.score}, ${p.vol} reviews`;
+    tip.style.left = (x(i) / W * r.width) + "px"; tip.style.top = (y(p.score) / H * r.height) + "px"; tip.classList.add("show");
+  };
+  const out = () => { tip.classList.remove("show"); xh.setAttribute("opacity", 0); xd.setAttribute("opacity", 0); };
+  $("#hit").addEventListener("pointermove", move);
+  $("#hit").addEventListener("pointerleave", out);
+}
+
+/* ---------- render: sources table ---------- */
+function renderSources() {
+  const b = B(), rows = Object.entries(b.sourceSplit).filter(([k]) => state.connected[state.biz].has(k));
+  $("#srcTable").innerHTML = `<thead><tr><th>Source</th><th class="num">Count</th><th class="num">Rating</th><th style="width:38%">Sentiment</th></tr></thead><tbody>` +
+    rows.map(([k, [n, r, p, u]]) => {
+      const s = SOURCES[k], neg = Math.max(0, 1 - p - u);
+      return `<tr><td><span class="src-name"><span class="src-glyph" style="background:${s.color}">${s.glyph}</span>${s.name}</span></td>
+        <td class="num">${nf(n)}</td><td class="num">${r ? r.toFixed(1) : "<span style='color:var(--muted)'>none</span>"}</td>
+        <td><div class="stack" title="${Math.round(p * 100)}% positive, ${Math.round(u * 100)}% neutral, ${Math.round(neg * 100)}% negative"><span style="width:${p * 100}%;background:var(--pos)"></span><span style="width:${u * 100}%;background:var(--neu)"></span><span style="width:${neg * 100}%;background:var(--neg)"></span></div></td></tr>`;
+    }).join("") + "</tbody>";
+}
+
+/* ---------- render: keyword index (diverging bars) ---------- */
+function renderTopics() {
+  const ts = [...B().topics].sort((a, b) => (b.pos + b.neg) - (a.pos + a.neg));
+  const max = Math.max(...ts.flatMap(t => [t.pos, t.neg]));
+  $("#topics").innerHTML = ts.map(t => {
+    const ratio = t.neg / Math.max(1, t.prev), rising = ratio >= 1.4;
+    return `<div class="topic-row" data-topic="${t.key}" tabindex="0" role="button" aria-label="${t.label}: ${t.neg} negative, ${t.pos} positive mentions">
+      <span class="topic-name">${t.label}</span>
+      <span class="topic-bar-neg"><span class="bar-num">${t.neg}</span><span class="bar" style="width:${t.neg / max * 82}%"></span></span>
+      <span class="topic-bar-pos"><span class="bar" style="width:${t.pos / max * 82}%"></span><span class="bar-num">${t.pos}</span></span>
+      <span class="topic-trend ${rising ? "up" : ""}">${rising ? `${arrowUp.replace('aria-hidden="true"', 'aria-hidden="true" width="9" height="9"')} ${ratio.toFixed(1)}×` : "Steady"}</span>
+    </div>`;
+  }).join("");
+  const tip = $("#topicTip");
+  $$("#topics .topic-row").forEach(row => {
+    const t = topicOf(row.dataset.topic);
+    row.addEventListener("click", () => openTopic(t.key));
+    row.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openTopic(t.key); } });
+    [...row.children].forEach(c => {
+      c.addEventListener("pointermove", e => {
+        const r = $("#topics").getBoundingClientRect();
+        const share = Math.round(t.pos / (t.pos + t.neg) * 100);
+        tip.innerHTML = `<b>${t.label}</b><br>${t.neg} negative, ${t.pos} positive (${share}% positive)<br>Last month: ${t.prev} negative`;
+        tip.style.left = (e.clientX - r.left) + "px"; tip.style.top = (e.clientY - r.top) + "px"; tip.classList.add("show");
+      });
+      c.addEventListener("pointerleave", () => tip.classList.remove("show"));
+    });
+  });
+}
+
+/* ---------- reviews ---------- */
+function reviewHTML(r, opts = {}) {
+  const s = SOURCES[r.src];
+  const id = r.id;
+  const rating = r.score10 ? `<span class="score10">${r.score10}/10</span>` :
+    r.rating ? `<span class="stars" aria-label="${r.rating} out of 5 stars">${"★".repeat(r.rating)}<span class="off">${"★".repeat(5 - r.rating)}</span></span>` : `<span class="review-when">Comment</span>`;
+  const sentLabel = { pos: "Positive", neg: "Negative", mixed: "Mixed" }[r.sent];
+  const replied = r.replied || state.replied[id];
+  const needs = !replied && (r.rating ? r.rating <= 4 || r.question : r.question);
+  return `<article class="review ${opts.fresh ? "fresh" : ""}" data-id="${id}">
+    <div class="review-top">
+      <span class="src-glyph" style="background:${s.color}" title="${s.name}">${s.glyph}</span>
+      <span class="review-author">${esc(r.author)}</span>${rating}
+      <span class="pill ${r.sent}">${sentLabel}</span>
+      ${opts.fresh ? '<span class="pill new">New</span>' : ""}
+      <span class="review-when">${s.name}, ${whenText(r.ago)}</span>
+    </div>
+    <p class="review-text">${markup(r.text)}</p>
+    <div class="chips">
+      ${r.topics.map(k => `<button class="chip" type="button" data-topic="${k}">${esc(topicOf(k)?.label || k)}</button>`).join("")}
+      <span class="review-actions">
+        ${replied ? `<span class="replied">✓ Replied</span>` : needs ? `<button class="btn" type="button" data-draft="${id}">Draft a reply</button>` : `<button class="btn" type="button" data-draft="${id}">Thank them</button>`}
+      </span>
+    </div>
+    <div class="reply-slot"></div>
+  </article>`;
+}
+
+function allReviews() {
+  const b = B();
+  const base = b.reviews.map((r, i) => ({ ...r, id: `${state.biz}-r${i}` }));
+  return [...state.feed.filter(f => f.biz === state.biz).map(f => f.r), ...base];
+}
+
+function renderLiveFeed(freshId) {
+  $("#liveFeed").innerHTML = allReviews().slice(0, 5).map(r => reviewHTML(r, { fresh: r.id === freshId })).join("");
+}
+
+function renderAllFeed() {
+  const fs = $("#fSource").value, se = $("#fSent").value, tp = $("#fTopic").value, un = $("#fUnanswered").value, q = $("#fSearch").value.trim().toLowerCase();
+  const list = allReviews().filter(r =>
+    (!fs || r.src === fs) && (!se || r.sent === se) && (!tp || r.topics.includes(tp)) &&
+    (!un || !(r.replied || state.replied[r.id])) && (!q || plain(r.text).toLowerCase().includes(q) || r.author.toLowerCase().includes(q)));
+  $("#allFeed").innerHTML = list.length ? list.map(r => reviewHTML(r)).join("") :
+    `<p style="color:var(--ink-2);margin:6px 0">No reviews match these filters. <button class="link-btn" type="button" id="clearFilters">Clear filters</button></p>`;
+  $("#fCount").textContent = `${list.length} shown from the latest ${allReviews().length}`;
+  const cf = $("#clearFilters"); if (cf) cf.onclick = () => { setFilters({}); };
+}
+
+function setFilters({ source = "", sent = "", topic = "", unanswered = "", search = "" }) {
+  $("#fSource").value = source; $("#fSent").value = sent; $("#fTopic").value = topic; $("#fUnanswered").value = unanswered; $("#fSearch").value = search;
+  renderAllFeed();
+}
+
+function fillFilterOptions() {
+  const b = B();
+  $("#fSource").innerHTML = `<option value="">All sources</option>` + [...state.connected[state.biz]].map(k => `<option value="${k}">${SOURCES[k].name}</option>`).join("");
+  $("#fTopic").innerHTML = `<option value="">All topics</option>` + b.topics.map(t => `<option value="${t.key}">${t.label}</option>`).join("");
+}
+
+/* reply drafts */
+function draftReply(r) {
+  const b = B(), first = r.author.startsWith("@") ? "" : " " + r.author.split(" ")[0];
+  const negTopics = (r.text.match(/\{-(.+?)-\}/g) || []).length;
+  const tLabels = r.topics.map(k => topicOf(k)?.label.replace(/^(?!Wi-Fi).*/, m => m.toLowerCase())).filter(Boolean);
+  const fixes = {
+    wifi: "Our team is replacing the Wi-Fi access points on floors 3 and 4 this week.",
+    noise: "The construction next door is scheduled to wrap up next month, and we now let every guest know at booking and offer harbor-side rooms first.",
+    breakfast: "We've added a second refill round to the buffet after 9am.",
+    parking: "We've added clearer garage directions to our pre-arrival email.",
+    checkin: "We're adding a second agent at the desk during the afternoon rush.",
+    wait: "We've changed how we space weekend reservations and added extra staff on Friday and Saturday nights.",
+    reserve: "Reserved tables are now held for at least 15 minutes.",
+    portion: "Our chef is reviewing main course portions this month.",
+    value: "", noise_r: ""
+  };
+  if (r.question) {
+    return `Hi${first}! Thanks so much${r.src === "instagram" || r.src === "tiktok" ? " for the love" : ""}. ` +
+      (r.topics.includes("rooftop") ? "Yes, the rooftop bar is open to everyone from 4pm to midnight; guests get priority seating after 8." :
+       r.topics.includes("patio") ? "Yes, well-behaved dogs are welcome on the patio, and we'll bring a water bowl." :
+       r.topics.includes("breakfast") ? "Breakfast is open to non-guests from 7 to 10:30am for $24." :
+       "We keep a few tables for walk-ins every night, and weeknights before 7pm are easiest.") + ` Hope to see you soon!`;
+  }
+  if (!negTopics) return `Thank you${first}! We're so glad you enjoyed ${tLabels.slice(0, 2).join(" and ") || "your visit"}. We'll share your note with the team. Hope to welcome you back soon.\n\nThe ${b.name} team`;
+  const fixLines = r.topics.map(k => fixes[k]).filter(Boolean).slice(0, 2).join(" ");
+  return `Hi${first}, thank you for taking the time to write this, and I'm sorry ${tLabels.length ? `about the ${tLabels.filter(l => !["staff", "location", "rooftop bar", "food quality", "cocktails", "desserts", "patio", "cleanliness"].includes(l)).join(" and ") || "parts of your visit"}` : "your visit fell short"}. ${fixLines || "We've shared your feedback with the team."} I'd love the chance to make it right. Please email me directly at gm@example.com.\n\nAlex, General Manager`;
+}
+
+document.addEventListener("click", e => {
+  const d = e.target.closest("[data-draft]");
+  if (d) {
+    const r = allReviews().find(x => x.id === d.dataset.draft); if (!r) return;
+    const slot = d.closest(".review").querySelector(".reply-slot");
+    if (slot.innerHTML) { slot.innerHTML = ""; return; }
+    slot.innerHTML = `<div class="reply-box"><label class="sr-only" for="rb-${r.id}">Reply draft</label><textarea id="rb-${r.id}"></textarea>
+      <div class="row"><span class="note">Draft written from this review. Edit before posting.</span>
+      <button class="btn" type="button" data-copy>Copy</button><button class="btn primary" type="button" data-mark="${r.id}">Mark as replied</button></div></div>`;
+    typeInto(slot.querySelector("textarea"), draftReply(r));
+    return;
+  }
+  const m = e.target.closest("[data-mark]");
+  if (m) { state.replied[m.dataset.mark] = true; refreshReviews(); renderKPIs(); toast("Marked as replied"); return; }
+  const c = e.target.closest("[data-copy]");
+  if (c) { const ta = c.closest(".reply-box").querySelector("textarea"); navigator.clipboard?.writeText(ta.value).catch(() => {}); toast("Reply copied"); return; }
+  const t = e.target.closest("[data-topic]");
+  if (t && !t.classList.contains("topic-row")) { openTopic(t.dataset.topic); return; }
+  const g = e.target.closest("[data-goto]");
+  if (g) { go(g.dataset.goto); if (g.dataset.unanswered) setFilters({ unanswered: "1" }); return; }
+});
+
+function typeInto(el, text) {
+  el.value = ""; let i = 0;
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduce) { el.value = text; return; }
+  const tick = () => { i = Math.min(text.length, i + 3); el.value = text.slice(0, i); if (i < text.length) requestAnimationFrame(tick); };
+  tick();
+}
+
+function refreshReviews() { renderLiveFeed(); if (state.view === "reviews") renderAllFeed(); }
+
+/* ---------- live stream simulation ---------- */
+function pushIncoming() {
+  const b = B(), list = b.incoming;
+  const key = state.biz;
+  const used = state.feed.filter(f => f.biz === key).length;
+  if (used >= list.length) return;
+  const src = list[used];
+  const r = { ...src, ago: 0, id: `${key}-live${used}`, replied: false };
+  state.feed.unshift({ biz: key, r });
+  const needs = r.rating ? r.rating <= 4 : r.question;
+  if (needs) state.extraUnanswered++;
+  renderLiveFeed(r.id);
+  renderKPIs();
+  if (state.view === "reviews" && !$("#allFeed .reply-box")) renderAllFeed();
+  const sentWord = { pos: "positive", neg: "negative", mixed: "mixed" }[r.sent];
+  $("#syncText").textContent = `Live from ${state.connected[key].size} sources, synced just now`;
+  toast(`New ${SOURCES[r.src].name} ${r.rating ? "review" : "comment"} from ${r.author}, ${sentWord}, about ${topicOf(r.topics[0])?.label.replace(/^(?!Wi-Fi).*/, m => m.toLowerCase())}`, "View", () => { go("overview"); });
+}
+let liveTimer = null;
+const TOUR = new URLSearchParams(location.search).has("tour");
+function startLive() { if (!liveTimer && !TOUR) liveTimer = setInterval(pushIncoming, 9000); }
+let syncAge = 0;
+setInterval(() => { syncAge = (syncAge + 1) % 9; if (syncAge) $("#syncText").textContent = `Live from ${state.connected[state.biz].size} sources, synced ${syncAge} sec ago`; }, 1000);
+
+/* ---------- topic drawer ---------- */
+function openTopic(key) {
+  const t = topicOf(key); if (!t) return;
+  const reviews = allReviews().filter(r => r.topics.includes(key));
+  const share = Math.round(t.pos / (t.pos + t.neg) * 100);
+  const rnd = mulberry(key.length * 31 + (state.biz === "hotel" ? 1 : 2));
+  // 8 weeks of negative mentions, ending at this month's pace
+  const weeks = []; const end = t.neg / 4.3, start = t.prev / 4.3;
+  for (let i = 0; i < 8; i++) { const f = i < 4 ? start : start + (end - start) * ((i - 3) / 4); weeks.push(Math.max(1, Math.round(f * (0.85 + rnd() * .3)))); }
+  const wmax = Math.max(...weeks);
+  const quotes = [...reviews].sort((a, b) => (a.sent === "neg" ? -1 : 1) - (b.sent === "neg" ? -1 : 1)).slice(0, 3);
+  $("#topicDrawerTitle").textContent = t.label;
+  $("#topicDrawerBody").innerHTML = `
+    <p class="big">${t.neg} negative and ${t.pos} positive mentions in 30 days</p>
+    <p style="color:var(--ink-2);margin:0">${share}% positive. Last month there were ${t.prev} negative mentions.</p>
+    <h3>Negative mentions per week</h3>
+    <svg viewBox="0 0 320 90" width="100%" height="90" role="img" aria-label="Negative mentions per week for 8 weeks">
+      ${weeks.map((w, i) => `<rect x="${i * 40 + 6}" y="${76 - w / wmax * 62}" width="28" height="${w / wmax * 62}" rx="4" fill="var(--neg)" opacity="${i < 4 ? .45 : 1}"><title>${w} negative mentions</title></rect><text class="axis-text" x="${i * 40 + 20}" y="${70 - w / wmax * 62}" text-anchor="middle">${i >= 6 ? w : ""}</text>`).join("")}
+      <line class="base-line" x1="0" x2="320" y1="76" y2="76"/>
+      <text class="axis-text" x="6" y="88">8 weeks ago</text><text class="axis-text" x="314" y="88" text-anchor="end">This week</text>
+    </svg>
+    <h3>Suggested next step</h3>
+    <div class="action">${esc(t.action)}</div>
+    <h3>What ${B().guest} are saying</h3>
+    ${quotes.length ? quotes.map(q => `<blockquote style="margin:0 0 10px;padding:6px 12px;border-left:3px solid ${q.sent === "pos" ? "var(--pos)" : q.sent === "neg" ? "var(--neg)" : "var(--line-strong)"}"><div>${markup(q.text)}</div><div style="font-size:12.5px;color:var(--muted);margin-top:4px">${esc(q.author)}, ${SOURCES[q.src].name}</div></blockquote>`).join("") : `<p style="color:var(--muted)">No recent quotes in this demo.</p>`}
+    <button class="btn primary" type="button" id="seeTopicReviews" style="margin-top:8px">See all ${t.label.replace(/^(?!Wi-Fi).*/, m => m.toLowerCase())} reviews</button>`;
+  $("#seeTopicReviews").onclick = () => { closeDrawers(); go("reviews"); setFilters({ topic: key }); };
+  openDrawer("#topicDrawer");
+}
+
+function openDrawer(sel) { closeDrawers(true); const d = $(sel); d.classList.add("open"); d.setAttribute("aria-hidden", "false"); $("#scrim").classList.add("show"); setTimeout(() => (d.querySelector("input") || d.querySelector("[data-close]")).focus(), 60); }
+function closeDrawers(keepScrim) { $$(".drawer").forEach(d => { d.classList.remove("open"); d.setAttribute("aria-hidden", "true"); }); if (!keepScrim) $("#scrim").classList.remove("show"); }
+$("#scrim").addEventListener("click", () => closeDrawers());
+$$("[data-close]").forEach(b => b.addEventListener("click", () => closeDrawers()));
+
+/* ---------- social ---------- */
+function renderSocial() {
+  const b = B(), posts = b.posts.filter(p => state.connected[state.biz].has(p.src));
+  const total = posts.reduce((s, p) => s + p.comments, 0);
+  const pos = posts.reduce((s, p) => s + p.comments * p.split[0], 0);
+  const qs = posts.reduce((s, p) => s + p.qCount, 0);
+  $("#socialSub").textContent = `Comments on your own posts are reviews too. Here is what people said on your last ${posts.length} posts.`;
+  $("#socialSummary").innerHTML = `
+    <div class="kpi"><div class="kpi-label">Comments read</div><div class="kpi-value">${nf(total)}</div><div class="kpi-delta">From ${[...new Set(posts.map(p => SOURCES[p.src].name))].join(" and ")}</div></div>
+    <div class="kpi"><div class="kpi-label">Positive</div><div class="kpi-value">${Math.round(pos / total * 100)}<small>%</small></div><div class="kpi-delta">Across all posts</div></div>
+    <div class="kpi"><div class="kpi-label">Questions with no answer</div><div class="kpi-value">${qs}</div><div class="kpi-delta bad">Each one is a possible booking</div></div>`;
+  $("#posts").innerHTML = posts.map(p => {
+    const s = SOURCES[p.src];
+    return `<div class="panel post">
+      <div class="thumb" style="background:${p.tint}"><svg viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="rgba(0,0,0,.25)"/><path d="M10 8v8l6-4z"/></svg>${s.name}</div>
+      <div style="min-width:0">
+        <h3>${esc(p.title)}</h3>
+        <div class="meta">${s.name}, posted ${whenText(p.ago).toLowerCase()}. ${nf(p.comments)} comments.</div>
+        <div class="stack" style="height:12px" title="${Math.round(p.split[0] * 100)}% positive, ${Math.round(p.split[1] * 100)}% neutral, ${Math.round(p.split[2] * 100)}% negative"><span style="width:${p.split[0] * 100}%;background:var(--pos)"></span><span style="width:${p.split[1] * 100}%;background:var(--neu)"></span><span style="width:${p.split[2] * 100}%;background:var(--neg)"></span></div>
+        <div style="font-size:12.5px;color:var(--ink-2);margin:5px 0 10px">${Math.round(p.split[0] * 100)}% positive, ${Math.round(p.split[2] * 100)}% negative</div>
+        <div class="chips">${p.themes.map(t => `<span class="chip" style="cursor:default">${esc(t)}</span>`).join("")}</div>
+        ${p.worry ? `<p style="font-size:13.5px;margin:10px 0 0"><mark class="n">“${esc(p.worry)}”</mark></p>` : ""}
+        <ul class="q-list">${p.questions.map(q => `<li><span>${esc(q)}</span><button class="link-btn" type="button" data-answer="${esc(q)}">Answer</button></li>`).join("")}</ul>
+        ${p.qCount > p.questions.length ? `<div style="font-size:12.5px;color:var(--muted);margin-top:6px">${p.qCount - p.questions.length} more unanswered questions</div>` : ""}
+      </div></div>`;
+  }).join("") || `<p>Connect Instagram or TikTok on the Sources page to see comments here.</p>`;
+}
+document.addEventListener("click", e => {
+  const a = e.target.closest("[data-answer]"); if (!a) return;
+  const li = a.closest("li"); li.innerHTML = `<span style="color:var(--good-text)">✓ Answered: ${esc(a.dataset.answer)}</span>`;
+  toast("Answer posted to the comment thread");
+});
+
+/* ---------- sources / integrations ---------- */
+function renderSourceGrid() {
+  const relevant = state.biz === "hotel" ? ["google", "tripadvisor", "booking", "expedia", "yelp"] : ["google", "yelp", "opentable", "tripadvisor"];
+  const social = ["instagram", "tiktok", "youtube", "facebook"];
+  const card = k => {
+    const s = SOURCES[k], on = state.connected[state.biz].has(k), split = B().sourceSplit[k];
+    return `<div class="src-card">
+      <div class="top"><span class="src-glyph" style="background:${s.color}">${s.glyph}</span><h3>${s.name}</h3></div>
+      <div class="how">${s.how}</div>
+      <div class="status ${on ? "on" : ""}">${on ? `✓ Connected. ${split ? nf(split[0]) + " " + (s.kind === "social" ? "comments" : "reviews") + " so far." : ""} Checks for new ones every 5 minutes.` : "Not connected"}</div>
+      <div class="foot">${on ? `<button class="btn" type="button" data-disconnect="${k}">Disconnect</button>` : `<button class="btn primary" type="button" data-connect="${k}">Connect ${s.name}</button>`}</div>
+    </div>`;
+  };
+  $("#srcReviewGrid").innerHTML = relevant.map(card).join("");
+  $("#srcSocialGrid").innerHTML = social.map(card).join("");
+}
+let connectKey = null, connectTimer = null;
+document.addEventListener("click", e => {
+  const c = e.target.closest("[data-connect]");
+  if (c) { startConnect(c.dataset.connect); return; }
+  const d = e.target.closest("[data-disconnect]");
+  if (d) { state.connected[state.biz].delete(d.dataset.disconnect); renderAfterSourceChange(); toast(`${SOURCES[d.dataset.disconnect].name} disconnected`); return; }
+  if (e.target.closest("[data-close-modal]")) closeModal();
+});
+function startConnect(k) {
+  connectKey = k; const s = SOURCES[k];
+  const count = { google: 412, tripadvisor: 268, booking: 301, expedia: 122, yelp: 188, opentable: 397, instagram: 545, tiktok: 286, youtube: 74, facebook: 131 }[k];
+  if (!B().sourceSplit[k]) B().sourceSplit[k] = [count, s.kind === "social" ? null : 4.2, .7, .15];
+  $("#connectTitle").textContent = `Connect ${s.name}`;
+  $("#connectDesc").textContent = s.how;
+  const steps = [`Sign in to ${s.name} as the owner`, `Choose ${B().name}`, `Import ${nf(count)} ${s.kind === "social" ? "comments" : "reviews"}`, "Read sentiment and topics"];
+  $("#connectSteps").innerHTML = steps.map(t => `<li><span class="tick">✓</span>${t}</li>`).join("");
+  $("#connectDone").disabled = true; $("#connectBar").style.width = "0";
+  $("#connectModal").classList.add("show");
+  let i = 0; const lis = $$("#connectSteps li");
+  const adv = () => {
+    lis.forEach((li, j) => { li.className = j < i ? "done" : j === i ? "active" : ""; });
+    $("#connectBar").style.width = (i / steps.length * 100) + "%";
+    if (i >= steps.length) { $("#connectDone").disabled = false; $("#connectDone").focus(); return; }
+    i++; connectTimer = setTimeout(adv, 900);
+  };
+  adv();
+}
+$("#connectDone").addEventListener("click", () => {
+  state.connected[state.biz].add(connectKey);
+  closeModal(); renderAfterSourceChange();
+  toast(`${SOURCES[connectKey].name} connected. New reviews will appear on their own.`);
+});
+function closeModal() { clearTimeout(connectTimer); $("#connectModal").classList.remove("show"); }
+function renderAfterSourceChange() { renderSourceGrid(); renderSources(); fillFilterOptions(); renderSocial(); $("#syncText").textContent = `Live from ${state.connected[state.biz].size} sources, synced just now`; }
+
+/* ---------- chat: ask your reviews ---------- */
+const COMMANDS = [
+  ["/brief", "Today's summary"],
+  ["/fix", "What to fix first"],
+  ["/topic", "Dig into a topic, like /topic wifi"],
+  ["/compare", "This month vs last month"],
+  ["/praise", "What people love"],
+  ["/reply", "Draft a reply to the latest bad review"],
+  ["/analyze", "Score any text, like /analyze the room was dirty"]
+];
+const LEX = {
+  pos: ["great", "amazing", "love", "loved", "lovely", "excellent", "clean", "spotless", "friendly", "best", "incredible", "perfect", "delicious", "comfortable", "helpful", "beautiful", "fantastic", "warm", "attentive", "recommend", "good", "nice", "fresh", "quick", "fast", "quiet"],
+  neg: ["dirty", "rude", "slow", "cold", "noisy", "loud", "broken", "terrible", "awful", "worst", "bad", "smelly", "small", "tiny", "expensive", "pricey", "overpriced", "wait", "waited", "late", "disappointing", "disappointed", "never", "unreliable", "stained", "noise", "didn't", "not"]
+};
+const TOPIC_WORDS = { wifi: ["wifi", "wi-fi", "internet", "signal"], noise: ["noise", "noisy", "loud", "drilling", "construction"], breakfast: ["breakfast", "buffet", "eggs", "coffee", "pastries"], staff: ["staff", "server", "team", "service", "front desk", "waiter"], clean: ["clean", "dirty", "spotless", "stained", "dust"], parking: ["parking", "garage"], checkin: ["check-in", "checkin", "check in", "line"], value: ["price", "pricey", "expensive", "value", "$"], wait: ["wait", "waited", "slow"], portion: ["portion", "small", "tiny"], food: ["food", "dish", "short rib", "delicious", "pasta"], rooftop: ["rooftop", "bar", "view"], location: ["location", "walk", "nearby"], reserve: ["reservation", "booked", "booking"], cocktails: ["cocktail", "drinks"], dessert: ["dessert", "tart"], patio: ["patio", "outside"] };
+
+function detectTopic(text) {
+  const t = text.toLowerCase();
+  for (const [k, words] of Object.entries(TOPIC_WORDS)) if (topicOf(k) && words.some(w => t.includes(w))) return k;
+  return null;
+}
+function analyze(text) {
+  const words = text.toLowerCase().match(/[a-z'$-]+/g) || [];
+  const p = words.filter(w => LEX.pos.includes(w)), n = words.filter(w => LEX.neg.includes(w));
+  const score = p.length - n.length;
+  const label = score > 0 ? "Positive" : score < 0 ? "Negative" : p.length ? "Mixed" : "Neutral";
+  const topics = Object.entries(TOPIC_WORDS).filter(([k, ws]) => ws.some(w => text.toLowerCase().includes(w))).map(([k]) => topicOf(k)?.label || k);
+  return `<p><b>${label}</b>.</p><ul><li>Positive words: ${p.length ? p.map(esc).join(", ") : "none"}</li><li>Negative words: ${n.length ? n.map(esc).join(", ") : "none"}</li><li>Topics: ${topics.length ? [...new Set(topics)].map(esc).join(", ") : "none found"}</li></ul><p style="color:var(--muted);font-size:13px">This demo scores text with a simple word list in your browser. The real product uses a language model that reads the whole sentence.</p>`;
+}
+function answer(raw) {
+  const b = B(), text = raw.trim(), low = text.toLowerCase();
+  const [cmd, ...rest] = text.split(/\s+/); const arg = rest.join(" ");
+  const free = !cmd.startsWith("/");
+  if (cmd === "/analyze") return arg ? analyze(arg) : `<p>Add some text after the command, like <code>/analyze the room was dirty but staff were lovely</code>.</p>`;
+  if (cmd === "/brief") return `<p><b>${esc(b.brief.headline)}</b></p><p>${b.brief.body(d => fmtDate(d, { month: "long", day: "numeric" }))}</p>`;
+  if (cmd === "/fix" || free && /fix|improve|worst|complain|problem/.test(low)) return `<p>Here's what to fix first, ranked by how many ${b.guest} it affects and how fast it is growing:</p><ol>${b.fixes.map(f => `<li><b>${esc(f.title)}.</b> ${esc(f.why)}</li>`).join("")}</ol><p>Want the detail? Try <code>/topic ${b.fixes[0].topic}</code>.</p>`;
+  if (cmd === "/compare" || free && /compare|last month|trend/.test(low)) {
+    const movers = [...b.topics].sort((x, y) => (y.neg - y.prev) - (x.neg - x.prev));
+    return `<p>Compared with the 30 days before:</p><ul><li>Average rating went from ${b.ratingPrev.toFixed(1)} to ${b.rating.toFixed(1)}.</li><li>Biggest jump in complaints: <b>${movers[0].label}</b> (${movers[0].prev} to ${movers[0].neg}) and <b>${movers[1].label}</b> (${movers[1].prev} to ${movers[1].neg}).</li><li>Steadiest strength: <b>${b.topics[0].label}</b>, ${b.topics[0].pos} positive mentions.</li></ul>`;
+  }
+  if (cmd === "/praise" || free && /\b(love|best|praise|like|good)\b/.test(low)) {
+    const top = [...b.topics].sort((x, y) => y.pos / (y.pos + y.neg) * y.pos - x.pos / (x.pos + x.neg) * x.pos).slice(0, 3);
+    const q = b.reviews.find(r => r.sent === "pos");
+    return `<p>${b.guest[0].toUpperCase() + b.guest.slice(1)} love these the most:</p><ul>${top.map(t => `<li><b>${t.label}</b>: ${t.pos} positive mentions, ${Math.round(t.pos / (t.pos + t.neg) * 100)}% positive</li>`).join("")}</ul>${q ? `<blockquote>${markup(q.text)}<br>${esc(q.author)}, ${SOURCES[q.src].name}</blockquote>` : ""}`;
+  }
+  if (cmd === "/reply") {
+    const r = allReviews().find(x => (x.sent === "neg" || x.sent === "mixed") && !(x.replied || state.replied[x.id]));
+    if (!r) return `<p>Every negative review has a reply. Nice work.</p>`;
+    return `<p>Here's a draft for <b>${esc(r.author)}</b> on ${SOURCES[r.src].name}:</p><blockquote>${esc(draftReply(r)).replace(/\n/g, "<br>")}</blockquote><p>You can edit it on the Reviews page before posting.</p>`;
+  }
+  const key = cmd === "/topic" ? (detectTopic(arg) || b.topics.find(t => t.label.replace(/^(?!Wi-Fi).*/, m => m.toLowerCase()).startsWith(arg.toLowerCase()))?.key) : detectTopic(low);
+  if (key) {
+    const t = topicOf(key), rs = allReviews().filter(r => r.topics.includes(key)), q = rs.find(r => r.sent !== "pos") || rs[0];
+    return `<p><b>${t.label}</b>: ${t.neg} negative and ${t.pos} positive mentions in 30 days (${t.prev} negative the month before).</p>${q ? `<blockquote>${markup(q.text)}<br>${esc(q.author)}, ${SOURCES[q.src].name}</blockquote>` : ""}<p><b>Suggested next step:</b> ${esc(t.action)}</p>`;
+  }
+  if (cmd === "/topic") return `<p>I couldn't find that topic. Try one of: ${b.topics.map(t => `<code>${t.label.replace(/^(?!Wi-Fi).*/, m => m.toLowerCase())}</code>`).join(", ")}.</p>`;
+  return `<p>In this demo I answer from ${esc(b.name)}'s reviews. Try a command, or ask about a topic like <b>${b.topics[7].label.replace(/^(?!Wi-Fi).*/, m => m.toLowerCase())}</b> or <b>${b.topics[4].label.replace(/^(?!Wi-Fi).*/, m => m.toLowerCase())}</b>.</p>`;
+}
+function chatIntro() {
+  const b = B();
+  $("#chatLog").innerHTML = `<div class="msg bot"><p>Ask me anything about what ${b.guest} are saying about ${esc(b.name)}. I read every review and comment from your connected sources.</p></div>
+    <div class="cmds">${COMMANDS.slice(0, 5).map(([c]) => `<button class="cmd" type="button" data-cmd="${c}">${c}</button>`).join("")}</div>`;
+}
+function sendChat(text) {
+  if (!text.trim()) return;
+  const log = $("#chatLog");
+  log.insertAdjacentHTML("beforeend", `<div class="msg me">${esc(text)}</div><div class="msg bot typing" id="typing"><span></span><span></span><span></span></div>`);
+  log.scrollTop = log.scrollHeight;
+  setTimeout(() => { $("#typing")?.remove(); log.insertAdjacentHTML("beforeend", `<div class="msg bot">${answer(text)}</div>`); log.scrollTop = log.scrollHeight; }, 650);
+}
+let sugIdx = 0;
+function updateSuggest() {
+  const v = $("#chatInput").value, box = $("#suggest");
+  if (!v.startsWith("/") || v.includes(" ")) { box.classList.remove("show"); return; }
+  const list = COMMANDS.filter(([c]) => c.startsWith(v.toLowerCase()));
+  if (!list.length) { box.classList.remove("show"); return; }
+  sugIdx = Math.min(sugIdx, list.length - 1);
+  box.innerHTML = list.map(([c, d], i) => `<button type="button" role="option" aria-selected="${i === sugIdx}" data-sug="${c}"><code>${c}</code><span>${d}</span></button>`).join("");
+  box.classList.add("show");
+}
+$("#chatInput").addEventListener("input", () => { sugIdx = 0; updateSuggest(); });
+$("#chatInput").addEventListener("keydown", e => {
+  const box = $("#suggest"); if (!box.classList.contains("show")) return;
+  const opts = [...box.querySelectorAll("[data-sug]")];
+  if (e.key === "ArrowDown") { e.preventDefault(); sugIdx = (sugIdx + 1) % opts.length; updateSuggest(); }
+  else if (e.key === "ArrowUp") { e.preventDefault(); sugIdx = (sugIdx - 1 + opts.length) % opts.length; updateSuggest(); }
+  else if (e.key === "Tab" || (e.key === "Enter" && opts[sugIdx] && $("#chatInput").value !== opts[sugIdx].dataset.sug)) {
+    e.preventDefault(); const c = opts[sugIdx].dataset.sug;
+    const needsArg = ["/topic", "/analyze"].includes(c);
+    $("#chatInput").value = c + (needsArg ? " " : ""); box.classList.remove("show");
+    if (!needsArg && e.key === "Enter") { sendChat(c); $("#chatInput").value = ""; }
+  } else if (e.key === "Escape") box.classList.remove("show");
+});
+$("#suggest").addEventListener("click", e => { const b = e.target.closest("[data-sug]"); if (!b) return; const c = b.dataset.sug; if (["/topic", "/analyze"].includes(c)) { $("#chatInput").value = c + " "; $("#chatInput").focus(); $("#suggest").classList.remove("show"); } else { sendChat(c); $("#chatInput").value = ""; $("#suggest").classList.remove("show"); } });
+$("#chatForm").addEventListener("submit", e => { e.preventDefault(); const v = $("#chatInput").value; $("#chatInput").value = ""; $("#suggest").classList.remove("show"); sendChat(v); });
+$("#chatLog").addEventListener("click", e => { const c = e.target.closest("[data-cmd]"); if (c) sendChat(c.dataset.cmd); });
+$("#askBtn").addEventListener("click", () => openDrawer("#chatDrawer"));
+document.addEventListener("keydown", e => {
+  const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+  if (e.key === "/" && !typing) { e.preventDefault(); openDrawer("#chatDrawer"); }
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); openDrawer("#chatDrawer"); }
+  if (e.key === "Escape") { closeDrawers(); closeModal(); }
+});
+
+/* ---------- toast ---------- */
+let toastT;
+function toast(msg, actionLabel, action) {
+  const t = $("#toast");
+  t.innerHTML = `<span>${esc(msg)}</span>${actionLabel ? `<button type="button">${esc(actionLabel)}</button>` : ""}`;
+  if (actionLabel) t.querySelector("button").onclick = () => { action(); t.classList.remove("show"); };
+  t.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("show"), 4200);
+}
+
+/* ---------- navigation ---------- */
+function go(view) {
+  state.view = view;
+  $$(".view").forEach(v => v.hidden = v.id !== `view-${view}`);
+  $$(".nav-btn").forEach(b => b.toggleAttribute("aria-current", b.dataset.view === view) || b.dataset.view === view && b.setAttribute("aria-current", "page"));
+  $$(".nav-btn").forEach(b => b.dataset.view === view ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current"));
+  if (view === "reviews") renderAllFeed();
+  if (view === "overview") renderTrend();
+  if (location.hash !== "#" + view) history.replaceState(null, "", "#" + view);
+  window.scrollTo({ top: 0 });
+}
+$$(".nav-btn").forEach(b => b.addEventListener("click", () => go(b.dataset.view)));
+$$("[data-range]").forEach(b => b.addEventListener("click", () => {
+  state.range = +b.dataset.range;
+  $$("[data-range]").forEach(x => x.setAttribute("aria-pressed", x === b));
+  renderKPIs(); renderTrend();
+}));
+$("#bizSelect").addEventListener("change", e => { state.biz = e.target.value; renderAll(); toast(`Switched to ${B().name}`); });
+["#fSource", "#fSent", "#fTopic", "#fUnanswered"].forEach(s => $(s).addEventListener("change", renderAllFeed));
+$("#fSearch").addEventListener("input", renderAllFeed);
+$("#fixList").addEventListener("click", e => { const f = e.target.closest("[data-topic]"); if (f) { e.stopPropagation(); openTopic(f.dataset.topic); } });
+
+/* theme toggle */
+function currentTheme() { return document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); }
+function syncThemeBtn() { $("#themeBtn").textContent = currentTheme() === "dark" ? "Switch to light" : "Switch to dark"; }
+$("#themeBtn").addEventListener("click", () => {
+  document.documentElement.dataset.theme = currentTheme() === "dark" ? "light" : "dark";
+  try { localStorage.setItem("loomin-theme", document.documentElement.dataset.theme); } catch (e) {}
+  syncThemeBtn();
+});
+try { const saved = localStorage.getItem("loomin-theme"); if (saved) document.documentElement.dataset.theme = saved; } catch (e) {}
+syncThemeBtn();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syncThemeBtn);
+
+
+/* ---------- simulated sign in ---------- */
+function startSync() {
+  $("#signinForm").hidden = true; $("#syncStep").hidden = false;
+  const b = B(), keys = [...state.connected[state.biz]];
+  $("#syncList").innerHTML = keys.map(k => `<li><span class="src-glyph" style="background:${SOURCES[k].color}">${SOURCES[k].glyph}</span><span>${SOURCES[k].name}</span><span class="cnt" data-n="${b.sourceSplit[k] ? b.sourceSplit[k][0] : 0}">Waiting</span></li>`).join("");
+  const lis = $$("#syncList li"); let i = 0;
+  const step = () => {
+    if (i < lis.length) {
+      const li = lis[i], c = li.querySelector(".cnt"), n = +c.dataset.n;
+      li.classList.add("done"); c.innerHTML = `${nf(n)} ${SOURCES[keys[i]].kind === "social" ? "comments" : "reviews"}<span class="ok">✓</span>`;
+      i++; $("#syncBar").style.width = (i / (lis.length + 1) * 100) + "%";
+      setTimeout(step, 420);
+    } else {
+      $("#syncBar").style.width = "100%";
+      $("#syncSub").textContent = "Done. Your morning brief is ready.";
+      setTimeout(enterApp, 650);
+    }
+  };
+  setTimeout(step, 300);
+}
+function enterApp() { startLive(); $("#auth").classList.add("gone"); setTimeout(() => { $("#auth").hidden = true; }, 520); go("overview"); }
+function showSignin() {
+  $("#auth").hidden = false; $("#auth").classList.remove("gone");
+  $("#signinForm").hidden = false; $("#syncStep").hidden = true; $("#syncBar").style.width = "0";
+  $("#syncSub").textContent = `Checking ${state.connected[state.biz].size} connected sources for anything new.`;
+}
+$("#signinForm").addEventListener("submit", e => { e.preventDefault(); startSync(); });
+$("#googleBtn").addEventListener("click", startSync);
+$("#signoutBtn").addEventListener("click", showSignin);
+
+
+/* ---------- guided tour: open with ?tour to auto-play the demo walkthrough ---------- */
+const TOUR_STEPS = [
+  { vo: "This is Loomin. Alex runs a 48-room boutique hotel, and her day starts here.", run: async () => {
+      await sleep(500); await moveTo("#authEmail"); await clickEl("#authEmail"); await typeInto2("#authEmail", "alex@lindenharbor.example", 28); await moveTo("#signinBtn"); } },
+  { vo: "When she signs in, Loomin has already pulled in every new review and comment from her connected sites. No exports and no spreadsheets.", run: async () => {
+      await clickEl("#signinBtn"); await sleep(4300); park(); } },
+  { vo: "Instead of reading hundreds of reviews, she gets a morning brief in plain English. Guests love the staff and the rooftop, but Wi-Fi complaints have quadrupled.", run: async () => {
+      spot(".brief-headline"); await moveTo(".brief-headline", .9, .85); await sleep(3800); unspot(); } },
+  { vo: "Loomin ranks what to fix first, by how many guests it affects and how fast it is growing. Every item links straight to the evidence.", run: async () => {
+      spot(".fix"); await moveTo(".fix-item", .3, .5); await sleep(2600); await moveTo(".fix-item", .35, .4); unspot(); await clickEl(".fix-item"); } },
+  { vo: "Here is the Wi-Fi detail: the weekly trend, the exact guest quotes, and a suggested next step. Alex decides what to do about it.", run: async () => {
+      await sleep(900); await moveTo("#topicDrawer .action", .5, .5); await sleep(1600); $("#topicDrawerBody").scrollTo({ top: 260, behavior: "smooth" }); await sleep(1500); } },
+  { vo: "The sentiment score shows when the trouble started. The keyword index shows everything guests talk about, the good and the bad.", run: async () => {
+      closeDrawers(); await sleep(300); scrollToEl("#trendChart", 120); await sleep(800); await sweepChart(); scrollToEl("#topics", 140); await sleep(700);
+      const row = $$('#topics .topic-row').find(r => r.dataset.topic === "wifi"); await moveTo(row.children[1], .5, .5); hoverEl(row.children[1]); await sleep(1400); } },
+  { vo: "New reviews stream in live. The AI reads every sentence, so great staff but terrible Wi-Fi counts as both.", run: async () => {
+      $("#topicTip").classList.remove("show"); scrollToEl("#liveFeed", 150); await sleep(700); pushIncoming(); await sleep(600);
+      await moveTo("#liveFeed .review mark.n", .5, .6); await sleep(1300); await moveTo("#liveFeed .review mark.p", .5, .6); } },
+  { vo: "Replying takes one click. Loomin drafts a specific reply, then Alex edits and approves it. A person always decides what gets posted.", run: async () => {
+      await moveTo("#liveFeed [data-draft]"); await clickEl("#liveFeed [data-draft]"); await sleep(2600); await moveTo("#liveFeed [data-mark]"); await sleep(1200); await clickEl("#liveFeed [data-mark]"); } },
+  { vo: "She can also just ask. Slash commands answer questions like what changed since last month, or what guests love most.", run: async () => {
+      window.scrollTo({ top: 0, behavior: "smooth" }); await moveTo("#askBtn"); await clickEl("#askBtn"); await sleep(500);
+      await typeInto2("#chatInput", "/compare", 70); await sleep(300); $("#suggest").classList.remove("show"); sendChat("/compare"); $("#chatInput").value = ""; await sleep(2600);
+      await typeInto2("#chatInput", "/praise", 70); $("#suggest").classList.remove("show"); sendChat("/praise"); $("#chatInput").value = ""; await sleep(1500); } },
+  { vo: "Comments on her own Instagram and TikTok posts count too, including questions that could turn into bookings.", run: async () => {
+      closeDrawers(); await moveTo('.nav-btn[data-view="social"]'); await clickEl('.nav-btn[data-view="social"]'); await sleep(900);
+      spot("#socialSummary .kpi:last-child"); await moveTo("#posts [data-answer]"); await sleep(900); unspot(); await clickEl("#posts [data-answer]"); } },
+  { vo: "Adding a new source takes one click. Loomin turns hours of reading into the one thing to fix today.", run: async () => {
+      await moveTo('.nav-btn[data-view="sources"]'); await clickEl('.nav-btn[data-view="sources"]'); await sleep(700);
+      await moveTo('[data-connect="youtube"]'); await clickEl('[data-connect="youtube"]'); await sleep(4000); await moveTo("#connectDone"); await clickEl("#connectDone"); await sleep(900);
+      await moveTo('.nav-btn[data-view="overview"]'); await clickEl('.nav-btn[data-view="overview"]'); park(); } }
+];
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+let cursorEl, captionEl;
+function tourUI() {
+  if (cursorEl) return;
+  cursorEl = document.createElement("div"); cursorEl.className = "tour-cursor";
+  cursorEl.innerHTML = '<svg viewBox="0 0 24 24"><path d="M4 2l16 9.5-7 1.6L9.6 20z" fill="#13211c" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+  captionEl = document.createElement("div"); captionEl.className = "tour-caption";
+  document.body.append(cursorEl, captionEl);
+}
+const elOf = t => typeof t === "string" ? $(t) : t;
+async function moveTo(t, fx = .5, fy = .5) {
+  const el = elOf(t); if (!el) return; const r = el.getBoundingClientRect();
+  if (r.top < 60 || r.bottom > innerHeight - 40) { el.scrollIntoView({ block: "center", behavior: "smooth" }); await sleep(600); }
+  const r2 = el.getBoundingClientRect();
+  cursorEl.style.left = (r2.left + r2.width * fx) + "px"; cursorEl.style.top = (r2.top + r2.height * fy) + "px"; await sleep(800);
+}
+async function clickEl(t) { const el = elOf(t); cursorEl.classList.remove("press"); void cursorEl.offsetWidth; cursorEl.classList.add("press"); await sleep(140); el?.click(); el?.focus?.({ preventScroll: true }); await sleep(260); cursorEl.classList.remove("press"); }
+async function typeInto2(t, text, ms) { const el = elOf(t); el.value = ""; for (const ch of text) { el.value += ch; el.dispatchEvent(new Event("input", { bubbles: true })); await sleep(ms); } }
+function park() { cursorEl.style.left = (innerWidth - 60) + "px"; cursorEl.style.top = (innerHeight * .55) + "px"; }
+function spot(sel) { unspot(); $(sel)?.classList.add("tour-spot"); }
+function unspot() { $$(".tour-spot").forEach(e => e.classList.remove("tour-spot")); }
+function scrollToEl(sel, off) { const el = $(sel); window.scrollTo({ top: el.getBoundingClientRect().top + scrollY - off, behavior: "smooth" }); }
+function hoverEl(el) { const r = el.getBoundingClientRect(); el.dispatchEvent(new PointerEvent("pointermove", { bubbles: true, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 })); }
+async function sweepChart() {
+  const hit = $("#hit"), r = hit.getBoundingClientRect();
+  for (let i = 0; i <= 24; i++) {
+    const x = r.left + r.width * (.05 + .9 * i / 24), y = r.top + r.height * .45;
+    cursorEl.style.transition = "none"; cursorEl.style.left = x + "px"; cursorEl.style.top = y + "px";
+    hit.dispatchEvent(new PointerEvent("pointermove", { bubbles: true, clientX: x, clientY: y })); await sleep(75);
+  }
+  cursorEl.style.transition = ""; hit.dispatchEvent(new PointerEvent("pointerleave"));
+}
+async function startTour(durations) {
+  tourUI(); const dur = durations || window.TOUR_DUR || [];
+  window.tourStepStarts = [];
+  const t0 = performance.now();
+  for (let i = 0; i < TOUR_STEPS.length; i++) {
+    const s = TOUR_STEPS[i], start = performance.now(); window.tourStepStarts.push((start - t0) / 1000);
+    captionEl.textContent = s.vo; captionEl.classList.add("show");
+    await s.run();
+    const want = (dur[i] || s.vo.split(" ").length * .42 + 1) * 1000, left = want - (performance.now() - start);
+    if (left > 0) await sleep(left);
+  }
+  captionEl.classList.remove("show"); window.tourDone = true;
+}
+if (TOUR && !window.TOUR_MANUAL) setTimeout(() => startTour(), 900);
+
+function renderAll() {
+  renderBrief(); renderKPIs(); renderTrend(); renderSources(); renderTopics(); renderLiveFeed();
+  fillFilterOptions(); renderSocial(); renderSourceGrid(); chatIntro();
+  if (state.view === "reviews") renderAllFeed();
+}
+let rT; addEventListener("resize", () => { clearTimeout(rT); rT = setTimeout(() => state.view === "overview" && renderTrend(), 120); });
+renderAll();
+const startView = location.hash.slice(1);
+go(["overview", "reviews", "social", "sources"].includes(startView) ? startView : "overview");
+</script>
+</body>
+</html>
